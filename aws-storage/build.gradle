@@ -31,7 +31,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'ru.imageprocessing:aws-storage-api:0.0.1-SNAPSHOT'
+    implementation project(':aws-storage-client')
 
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
     implementation 'org.springframework.boot:spring-boot-starter-security'

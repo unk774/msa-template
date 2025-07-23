@@ -90,7 +90,7 @@ tasks.build.finalizedBy(publishToMavenLocal)
 publishing {
     publications {
         maven(MavenPublication) {
-            artifactId = 'aws-storage-api'
+            artifactId = 'aws-storage-client'
             from components.java
         }
     }
