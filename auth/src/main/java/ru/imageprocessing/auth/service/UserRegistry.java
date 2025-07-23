@@ -22,7 +22,7 @@ public class UserRegistry {
     @Value("${keycloak.realm}")
     private String realm;
 
-    public void createUser(RegisterUserRequest registerUserRequest) {
+    public Integer createUser(RegisterUserRequest registerUserRequest) {
         // User representation
         UserRepresentation user = new UserRepresentation();
         user.setUsername(registerUserRequest.getLogin());
@@ -49,9 +49,9 @@ public class UserRegistry {
 
                 usersResource.get(userId).resetPassword(credential);
                 log.info("User created successfully with ID: " + userId);
-            } else {
-                throw new RuntimeException("Failed to create user. Status: " + response.getStatus());
             }
+
+            return response.getStatus();
         }
     }
 }
