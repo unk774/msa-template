@@ -145,14 +145,17 @@ components:
     RegisterUserRequest:
       type: object
       required:
-        - email
+        - login
         - password
-        - firstName
+        - email
       properties:
         email:
           type: string
           format: email
           example: "user@example.com"
+        login:
+          type: string
+          example: "user"
         password:
           type: string
           format: password

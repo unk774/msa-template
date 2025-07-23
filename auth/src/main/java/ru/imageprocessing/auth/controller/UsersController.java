@@ -1,0 +1,30 @@
+package ru.imageprocessing.auth.controller;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import ru.imageprocessing.auth.api.UsersApi;
+import ru.imageprocessing.auth.api.dto.RegisterUserRequest;
+import ru.imageprocessing.auth.api.dto.UserResponse;
+import ru.imageprocessing.auth.service.UserRegistry;
+
+@RequiredArgsConstructor
+@Slf4j
+@RestController
+@RequestMapping(path = "/api/v1/auth")
+public class UsersController implements UsersApi {
+    private final UserRegistry userRegistry;
+
+    @Override
+    public ResponseEntity<UserResponse> usersRegisterPost(RegisterUserRequest registerUserRequest) {
+        userRegistry.createUser(registerUserRequest);
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<UserResponse> usersUserIdGet(String userId) {
+        return null;
+    }
+}
