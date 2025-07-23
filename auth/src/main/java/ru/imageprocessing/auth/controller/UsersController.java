@@ -14,7 +14,7 @@ import ru.imageprocessing.auth.service.UserRegistry;
 @RequiredArgsConstructor
 @Slf4j
 @RestController
-@RequestMapping(path = "/api/v1/auth")
+@RequestMapping(path = "/api/v1")
 public class UsersController implements UsersApi {
     private final UserRegistry userRegistry;
     private final UserResponseMapper userResponseMapper;
@@ -23,10 +23,5 @@ public class UsersController implements UsersApi {
     public ResponseEntity<UserResponse> usersRegisterPost(RegisterUserRequest registerUserRequest) {
         userRegistry.createUser(registerUserRequest);
         return ResponseEntity.ok(userResponseMapper.toResponse(registerUserRequest));
-    }
-
-    @Override
-    public ResponseEntity<UserResponse> usersUserIdGet(String userId) {
-        return null;
     }
 }

@@ -62,27 +62,6 @@ paths:
         '401':
           description: Невалидный refresh token
 
-  /auth/validate:
-    post:
-      tags: [Auth]
-      summary: Валидация токена
-      description: Проверяет валидность JWT токена
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ValidateTokenRequest'
-      responses:
-        '200':
-          description: Токен валиден
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TokenValidationResponse'
-        '401':
-          description: Токен невалиден
-
   /users/register:
     post:
       tags: [Users]
@@ -102,29 +81,6 @@ paths:
                 $ref: '#/components/schemas/UserResponse'
         '409':
           description: Пользователь уже существует
-
-  /users/{userId}:
-    get:
-      tags: [Users]
-      summary: Получить информацию о пользователе
-      security:
-        - bearerAuth: []
-      parameters:
-        - in: path
-          name: userId
-          required: true
-          schema:
-            type: string
-          description: ID пользователя
-      responses:
-        '200':
-          description: Информация о пользователе
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserResponse'
-        '404':
-          description: Пользователь не найден
 
 components:
   schemas:
