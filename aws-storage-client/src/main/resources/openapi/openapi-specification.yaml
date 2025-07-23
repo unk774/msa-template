@@ -1,0 +1,151 @@
+openapi: 3.0.0
+info:
+  title: Image Storage Service API
+  description: Микросервис для хранения изображений (AWS S3 / MinIO)
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Локальный сервер
+  - url: https://api.your-storage-service.com
+    description: Production сервер
+
+tags:
+  - name: Storage
+    description: Управление изображениями в хранилище
+
+paths:
+  /storage/upload:
+    post:
+      tags: [Storage]
+      summary: Загрузить изображение
+      description: Загружает файл в S3/MinIO и возвращает его уникальный ID.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Файл изображения (JPEG, PNG, etc.)
+      responses:
+        '200':
+          description: Файл успешно загружен
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fileId:
+                    type: string
+                    example: "a1b2c3d4-e5f6-7890"
+                  url:
+                    type: string
+                    example: "http://minio-bucket.s3.amazonaws.com/a1b2c3d4.jpg"
+        '400':
+          description: Неверный формат файла
+        '500':
+          description: Ошибка сервера при загрузке
+
+  /storage/{fileId}:
+    get:
+      tags: [ Storage ]
+      summary: Скачать изображение
+      description: Возвращает файл изображения в виде бинарного потока (application/octet-stream).
+      parameters:
+        - in: path
+          name: fileId
+          required: true
+          schema:
+            type: string
+          description: Уникальный ID файла
+      responses:
+        '200':
+          description: Файл найден
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+              description: Имя файла (например, "attachment; filename=image.jpg")
+        '404':
+          description: Файл не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags: [Storage]
+      summary: Удалить изображение
+      description: Удаляет файл из хранилища.
+      parameters:
+        - in: path
+          name: fileId
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Файл успешно удален
+        '404':
+          description: Файл не найден
+        '500':
+          description: Ошибка сервера
+
+  /storage/{fileId}/metadata:
+    get:
+      tags: [Storage]
+      summary: Получить метаданные файла
+      description: Возвращает метаданные (размер, формат, дата создания) изображения.
+      parameters:
+        - in: path
+          name: fileId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Метаданные получены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fileId:
+                    type: string
+                  size:
+                    type: integer
+                    example: 1024
+                  format:
+                    type: string
+                    example: "JPEG"
+                  lastModified:
+                    type: string
+                    format: date-time
+        '404':
+          description: Файл не найден
+
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "File not found"
+        status:
+          type: integer
+          example: 404

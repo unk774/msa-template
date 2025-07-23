@@ -1,0 +1,211 @@
+{
+  "realm": "image-processing",
+  "enabled": true,
+  "accessTokenLifespan": 1800,
+  "accessTokenLifespanForImplicitFlow": 9000,
+  "users": [
+    {
+      "username": "image-processing-admin-account",
+      "enabled": true,
+      "serviceAccountClientId": "image-processing-admin",
+      "realmRoles": [
+        "default-roles-image-processing",
+        "default:read",
+        "default:write"
+      ]
+    },
+    {
+      "username": "administrator",
+      "enabled": true,
+      "totp": false,
+      "emailVerified": false,
+      "firstName": "A",
+      "lastName": "A",
+      "email": "administrator@mail.ru",
+      "credentials" : [ {
+        "type" : "password",
+        "userLabel" : "My password",
+        "createdDate" : 1736273618180,
+        "secretData" : "{\"value\":\"YnSIcFMQyGooTBOxgxzFgMyAFHvSQJmLOsUNHY0bfpk=\",\"salt\":\"rcyvuCHQhmV6Ct0U+0DDDA==\",\"additionalParameters\":{}}",
+        "credentialData" : "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
+      } ],
+      "realmRoles": [
+        "uma_authorization",
+        "default:read",
+        "default:write"
+      ],
+      "clientRoles": {
+        "realm-management": ["query-users", "view-users", "query-groups"],
+        "account": ["view-groups"]
+      },
+      "groups": [
+        "/ProcessingGroup"
+      ]
+    }
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "image-processing-system:admin",
+        "description": "Image processing System Administrator"
+      },
+      {
+        "name": "default:write",
+        "description": ""
+      },
+      {
+        "name": "default:read",
+        "description": ""
+      }
+    ]
+  },
+  "groups": [
+    {
+      "name": "ProcessingGroup",
+      "path": "/ProcessingGroup",
+      "subGroups": [],
+      "attributes": {},
+      "realmRoles": [],
+      "clientRoles": {}
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "image-processing-admin",
+      "name": "Service account",
+      "clientAuthenticatorType": "client-secret",
+      "secret": "kqDoa2+jTLpdO5Ab4yqAAqrcDN7AvMXe",
+      "redirectUris": [
+        "*"
+      ],
+      "serviceAccountsEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "defaultClientScopes": [
+        "roles",
+        "image-processing-permissions",
+        "image-processing-system:admin"
+      ],
+      "optionalClientScopes": [
+        "profile"
+      ]
+    }
+  ],
+  "clientScopes": [
+    {
+      "name": "image-processing-permissions",
+      "description": "Image processing permissions scope",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "false",
+        "display.on.consent.screen": "true",
+        "gui.order": "",
+        "consent.screen.text": ""
+      },
+      "protocolMappers": [
+        {
+          "name": "groups",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "multivalued": "true",
+            "user.attribute": "foo",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "groups",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "name": "email",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "user.attribute": "email",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "email",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "name": "sub",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-sub-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "access.token.claim": "true"
+          }
+        },
+        {
+          "name": "username",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "user.attribute": "username",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "claim.name": "preferred_username",
+            "jsonType.label": "String"
+          }
+        },
+        {
+          "name": "image-processing-permissions",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "multivalued": "true",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "lightweight.claim": "false",
+            "access.token.claim": "true",
+            "claim.name": "image-processing-permissions",
+            "jsonType.label": "String"
+          }
+        }
+      ]
+    },
+    {
+      "name": "image-processing-system:admin",
+      "description": "Image processing system admin scope",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "false",
+        "display.on.consent.screen": "true",
+        "gui.order": "",
+        "consent.screen.text": ""
+      },
+      "protocolMappers": [
+        {
+          "name": "sub",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-sub-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "access.token.claim": "true"
+          }
+        },
+        {
+          "name": "add-role-image-processing-system:admin",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-hardcoded-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "role": "image-processing-system:admin"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,144 @@
+services:
+  postgresql:
+    container_name: image-processing-postgresql
+    hostname: postgresql
+    environment:
+      PGDATA: /var/lib/postgresql/pgdata4
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+    volumes:
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - postgres_data:/var/lib/postgresql/pgdata4
+    image: postgres:${POSTGRESQL_VERSION}
+    healthcheck:
+      test: [ "CMD-SHELL", "exec pg_isready -U ${POSTGRES_USERNAME} -d keycloak" ]
+      interval: 5s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
+    networks:
+      - image-processing-network
+    ports:
+      - 5432:5432
+  smtp4dev:
+    image: rnwood/smtp4dev:v3
+    container_name: image-processing-smtp4dev
+    hostname: smtp4dev
+    ports:
+      - "3000:80"         # Web UI port
+      - "2525:25"         # SMTP port (for receiving emails)
+      - "465:465"         # SMTPS port (SSL/TLS)
+      - "587:587"         # Submission port (STARTTLS)
+    networks:
+      - image-processing-network
+    restart: unless-stopped
+    environment:
+      - Smtp4Dev__DisableMessageSanitization=true  # Allows HTML emails
+      #- Smtp4Dev__ServerOptions__RequireAuthentication=true  # Enable auth
+      #- Smtp4Dev__ServerOptions__AllowRemoteConnections=true  # Allow remote access
+  keycloak:
+    image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}
+    hostname: keycloak
+    container_name: image-processing-keycloak
+    environment:
+      KC_DB: postgres
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgresql
+      DB_DATABASE: ${DB_DATABASE}
+      DB_SCHEMA: public
+      KC_DB_URL: jdbc:postgresql://postgresql/${DB_DATABASE}
+      KC_DB_USERNAME: ${KC_DB_USERNAME}
+      KC_DB_PASSWORD: ${KC_DB_PASSWORD}
+      KC_HOSTNAME: keycloak
+      KC_HEALTH_ENABLED: true
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USERNAME}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_HTTP_PORT: 8880
+    ports:
+      - '8880:8880'
+    command: start-dev --import-realm
+    healthcheck:
+      test: [ "CMD-SHELL", 'exec 3<>/dev/tcp/localhost/8880; echo -e "GET /health/ready HTTP/1.1\nhost: localhost:8880\n" >&3; timeout --preserve-status 1 cat <&3 | grep -m 1 status | grep -m 1 UP; ERROR=$?; exec 3<&-; exec 3>&-; exit $ERROR' ]
+      start_period: 10s
+      interval: 30s
+      retries: 3
+      timeout: 5s
+    volumes:
+      - ./keycloak:/opt/keycloak/data/import:ro
+    depends_on:
+      postgresql:
+        condition: service_healthy
+    networks:
+      - image-processing-network
+  minio:
+    image: minio/minio
+    container_name: image-processing-minio
+    command: server /data --console-address ":9090"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    volumes:
+#      - ./minio/minio-data:/data
+      - ./minio/preload-files:/preload
+    entrypoint: >
+      /bin/sh -c '
+        set -e
+        isAlive() { curl -sf http://127.0.0.1:9000/minio/health/live; }
+        
+        bucketExists() {
+            mc ls local/$1 >/dev/null 2>&1
+        }
+        
+        # Запускаем MinIO в фоновом режиме
+        minio server /data --console-address ":9001" &
+      
+        # Ждём пока MinIO запустится
+        while ! mc alias set local http://localhost:9000 admin admin123 2>/dev/null; do
+          sleep 1
+        done
+      
+        # Создаём бакеты и копируем файлы
+        if ! bucketExists ${S3_STORE_BUCKET}; then
+            mc mb local/${S3_STORE_BUCKET}
+        fi
+        if ! bucketExists ${S3_NOTIFICATION_BUCKET}; then
+            mc mb local/${S3_NOTIFICATION_BUCKET}
+        fi
+        mc cp --recursive /preload/ local/notifications/
+      
+        # Возвращаем MinIO на передний план
+        while isAlive; do sleep 0.1; done
+        exec minio $0 "$@"
+      '
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    networks:
+      - image-processing-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+  image-processing-s3-store:
+    container_name: image-processing-s3-store
+    hostname: image-processing-s3-store
+    depends_on:
+      - keycloak
+    environment:
+      - AUTH_SERVER_URL=http://keycloak:8880
+      - S3_ENDPOINT=http://minio:9000
+      - S3_ACCESS_KEY=${MINIO_ROOT_USER}
+      - S3_SECRET_KEY=${MINIO_ROOT_PASSWORD}
+    image: imageprocessing/image-processing-aws-storage:latest
+    networks:
+      - image-processing-network
+    ports:
+      - 8080:8080
+networks:
+  image-processing-network:
+    driver: bridge
+    name: image-processing-network
+volumes:
+  postgres_data:
+    driver: local

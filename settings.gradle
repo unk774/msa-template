@@ -1,0 +1,2 @@
+rootProject.name = 'image-processing'
+include('aws-storage', 'aws-storage-client')
