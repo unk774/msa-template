@@ -223,7 +223,7 @@ components:
     UserResponse:
       type: object
       properties:
-        id:
+        login:
           type: string
           example: "user123"
         email:

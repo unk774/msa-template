@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.imageprocessing.auth.api.UsersApi;
 import ru.imageprocessing.auth.api.dto.RegisterUserRequest;
 import ru.imageprocessing.auth.api.dto.UserResponse;
+import ru.imageprocessing.auth.mapper.UserResponseMapper;
 import ru.imageprocessing.auth.service.UserRegistry;
 
 @RequiredArgsConstructor
@@ -16,11 +17,12 @@ import ru.imageprocessing.auth.service.UserRegistry;
 @RequestMapping(path = "/api/v1/auth")
 public class UsersController implements UsersApi {
     private final UserRegistry userRegistry;
+    private final UserResponseMapper userResponseMapper;
 
     @Override
     public ResponseEntity<UserResponse> usersRegisterPost(RegisterUserRequest registerUserRequest) {
         userRegistry.createUser(registerUserRequest);
-        return null;
+        return ResponseEntity.ok(userResponseMapper.toResponse(registerUserRequest));
     }
 
     @Override

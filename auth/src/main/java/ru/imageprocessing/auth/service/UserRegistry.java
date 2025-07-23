@@ -2,6 +2,7 @@ package ru.imageprocessing.auth.service;
 
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UsersResource;
@@ -13,6 +14,7 @@ import ru.imageprocessing.auth.api.dto.RegisterUserRequest;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserRegistry {
 
     private final Keycloak keycloak;
@@ -46,10 +48,9 @@ public class UserRegistry {
                 credential.setTemporary(false);
 
                 usersResource.get(userId).resetPassword(credential);
-
-                System.out.println("User created successfully with ID: " + userId);
+                log.info("User created successfully with ID: " + userId);
             } else {
-                System.out.println("Failed to create user. Status: " + response.getStatus());
+                throw new RuntimeException("Failed to create user. Status: " + response.getStatus());
             }
         }
     }
