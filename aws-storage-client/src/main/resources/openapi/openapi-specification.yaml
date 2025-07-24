@@ -4,9 +4,9 @@ info:
   description: Микросервис для хранения изображений (AWS S3 / MinIO)
   version: 1.0.0
 servers:
-  - url: http://localhost:8080
+  - url: http://localhost:8080/api/v1
     description: Локальный сервер
-  - url: https://api.your-storage-service.com
+  - url: https://api.your-storage-service.com/api/v1
     description: Production сервер
 
 tags:
@@ -14,7 +14,7 @@ tags:
     description: Управление изображениями в хранилище
 
 paths:
-  /storage/upload:
+  /api/v1/storage/upload:
     post:
       tags: [Storage]
       summary: Загрузить изображение
@@ -49,7 +49,7 @@ paths:
         '500':
           description: Ошибка сервера при загрузке
 
-  /storage/{fileId}:
+  /api/v1/storage/{fileId}:
     get:
       tags: [ Storage ]
       summary: Скачать изображение
@@ -105,7 +105,7 @@ paths:
         '500':
           description: Ошибка сервера
 
-  /storage/{fileId}/metadata:
+  /api/v1/storage/{fileId}/metadata:
     get:
       tags: [Storage]
       summary: Получить метаданные файла

@@ -1,4 +1,4 @@
-package ru.imageprocessing.auth.controller;
+package ru.imageprocessing.gateway.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,24 +9,22 @@ import ru.imageprocessing.auth.api.AuthApi;
 import ru.imageprocessing.auth.api.dto.AuthResponse;
 import ru.imageprocessing.auth.api.dto.LoginRequest;
 import ru.imageprocessing.auth.api.dto.RefreshTokenRequest;
-import ru.imageprocessing.auth.api.dto.TokenValidationResponse;
-import ru.imageprocessing.auth.api.dto.ValidateTokenRequest;
-import ru.imageprocessing.auth.service.Auth;
+import ru.imageprocessing.gateway.feign.AuthClient;
 
 @RequiredArgsConstructor
 @Slf4j
 @RestController
 public class AuthController implements AuthApi {
 
-    private final Auth auth;
+    private final AuthClient authClient;
 
     @Override
     public ResponseEntity<AuthResponse> apiV1AuthLoginPost(LoginRequest loginRequest) {
-        return ResponseEntity.ok(auth.login(loginRequest));
+        return authClient.apiV1AuthLoginPost(loginRequest);
     }
 
     @Override
     public ResponseEntity<AuthResponse> apiV1AuthRefreshPost(RefreshTokenRequest refreshTokenRequest) {
-        return ResponseEntity.ok(auth.refreshToken(refreshTokenRequest.getRefreshToken()));
+        return authClient.apiV1AuthRefreshPost(refreshTokenRequest);
     }
 }

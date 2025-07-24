@@ -135,6 +135,30 @@ services:
       - image-processing-network
     ports:
       - 8080:8080
+  image-processing-auth:
+    container_name: image-processing-auth
+    hostname: image-processing-auth
+    depends_on:
+      - keycloak
+    environment:
+      - AUTH_SERVER_URL=http://keycloak:8880
+    image: imageprocessing/image-processing-auth:latest
+    networks:
+      - image-processing-network
+    ports:
+      - 8081:8081
+  image-processing-gateway:
+    container_name: image-processing-gateway
+    hostname: image-processing-gateway
+    depends_on:
+      - keycloak
+    environment:
+      - AUTH_SERVER_URL=http://keycloak:8880
+    image: imageprocessing/image-processing-gateway
+    networks:
+      - image-processing-network
+    ports:
+      - 8082:8082
 networks:
   image-processing-network:
     driver: bridge
