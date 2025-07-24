@@ -15,6 +15,7 @@ import ru.imageprocessing.auth.service.UserRegistry;
 @Slf4j
 @RestController
 public class UsersController implements UsersApi {
+    //TODO authorized user info
     private final UserRegistry userRegistry;
     private final UserResponseMapper userResponseMapper;
 
