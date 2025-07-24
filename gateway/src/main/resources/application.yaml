@@ -43,3 +43,5 @@ feign:
     url: ${AUTH_URL:http://localhost:8081}
   store:
     url: ${STORE_URL:http://localhost:8080}
+  notification:
+    url: ${NOTIFICATION_URL:http://localhost:8083}

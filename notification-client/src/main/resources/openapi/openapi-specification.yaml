@@ -1,11 +1,11 @@
 openapi: 3.0.0
 info:
-  title: notifications
+  title: Notifications API
   version: '1.0'
-  description: Описание методов API для сервиса уведомлений
+  description: API methods description for the notification service
 tags:
   - name: notifications
-    description: Уведомления
+    description: Notifications
 
 paths:
   /notifications:
@@ -84,7 +84,7 @@ components:
           example: 'subject'
         templateCode:
           type: string
-          description: Template Code
+          description: Template code
           example: 'downloadLink'
         templateFormat:
           type: string
@@ -93,8 +93,9 @@ components:
           enum:
             - HTML
             - TXT
+
     ErrorResponse:
-      description: Ответ с ошибкой
+      description: Error response
       title: ErrorResponse
       type: object
       properties:
@@ -102,7 +103,7 @@ components:
           $ref: '#/components/schemas/ErrorBody'
 
     ErrorBody:
-      description: Тело ошибки
+      description: Error body
       title: ErrorBody
       type: object
       properties:
@@ -113,4 +114,4 @@ components:
         message:
           type: string
           description: Error message
-          example: 'Exception when processing http request'
+          example: 'Exception when processing HTTP request'

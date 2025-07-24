@@ -1,27 +1,27 @@
 openapi: 3.0.0
 info:
   title: Authentication Service API
-  description: Микросервис для аутентификации и управления пользователями
+  description: Microservice for user authentication and management
   version: 1.0.0
 servers:
   - url: http://localhost:8081/api/v1
-    description: Локальный сервер
+    description: Local server
   - url: https://auth.your-service.com/api/v1
-    description: Production сервер
+    description: Production server
 
 tags:
   - name: Auth
-    description: Аутентификация и токены
+    description: Authentication and tokens
   - name: Users
-    description: Управление пользователями
+    description: User management
 
 paths:
   /api/v1/auth/login:
     post:
       tags: [Auth]
-      summary: Аутентификация пользователя
+      summary: User authentication
       operationId: getToken
-      description: Возвращает JWT токен для доступа к API
+      description: Returns JWT token for API access
       requestBody:
         required: true
         content:
@@ -30,13 +30,13 @@ paths:
               $ref: '#/components/schemas/LoginRequest'
       responses:
         '200':
-          description: Успешная аутентификация
+          description: Successful authentication
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthResponse'
         '401':
-          description: Неверные учетные данные
+          description: Invalid credentials
           content:
             application/json:
               schema:
@@ -45,9 +45,9 @@ paths:
   /api/v1/auth/refresh:
     post:
       tags: [Auth]
-      summary: Обновление токена
+      summary: Token refresh
       operationId: refreshToken
-      description: Возвращает новый access token по refresh token
+      description: Returns new access token using refresh token
       requestBody:
         required: true
         content:
@@ -56,18 +56,18 @@ paths:
               $ref: '#/components/schemas/RefreshTokenRequest'
       responses:
         '200':
-          description: Токен успешно обновлен
+          description: Token successfully refreshed
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthResponse'
         '401':
-          description: Невалидный refresh token
+          description: Invalid refresh token
 
   /api/v1/users/register:
     post:
       tags: [Users]
-      summary: Регистрация нового пользователя
+      summary: Register new user
       operationId: registerUser
       requestBody:
         required: true
@@ -77,13 +77,13 @@ paths:
               $ref: '#/components/schemas/RegisterUserRequest'
       responses:
         '201':
-          description: Пользователь создан
+          description: User created
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserResponse'
         '409':
-          description: Пользователь уже существует
+          description: User already exists
 
 components:
   schemas:
@@ -221,4 +221,4 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: "JWT токен для аутентификации"
+      description: "JWT token for authentication"

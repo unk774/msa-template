@@ -5,12 +5,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import ru.imageprocessing.gateway.feign.AuthClient;
+import ru.imageprocessing.gateway.feign.NotificationClient;
 import ru.imageprocessing.gateway.feign.StoreClient;
 import ru.imageprocessing.gateway.feign.UserRegistryClient;
 
 @SpringBootApplication
 @EnableWebSecurity
-@EnableFeignClients(clients = {AuthClient.class, StoreClient.class, UserRegistryClient.class})
+@EnableFeignClients(clients = {AuthClient.class, StoreClient.class, UserRegistryClient.class, NotificationClient.class})
 //TODO reactive webflux
 //TODO prometheus
 public class GatewayApplication {

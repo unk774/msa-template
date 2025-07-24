@@ -1,25 +1,25 @@
 openapi: 3.0.0
 info:
   title: Image Storage Service API
-  description: Микросервис для хранения изображений (AWS S3 / MinIO)
+  description: Microservice for storing images (AWS S3 / MinIO)
   version: 1.0.0
 servers:
   - url: http://localhost:8080/api/v1
-    description: Локальный сервер
+    description: Local server
   - url: https://api.your-storage-service.com/api/v1
-    description: Production сервер
+    description: Production server
 
 tags:
   - name: Storage
-    description: Управление изображениями в хранилище
+    description: Image storage management
 
 paths:
   /api/v1/storage/upload:
     post:
       tags: [Storage]
-      summary: Загрузить изображение
+      summary: Upload an image
       operationId: upload
-      description: Загружает файл в S3/MinIO и возвращает его уникальный ID.
+      description: Uploads a file to S3/MinIO and returns its unique ID.
       requestBody:
         required: true
         content:
@@ -30,10 +30,10 @@ paths:
                 file:
                   type: string
                   format: binary
-                  description: Файл изображения (JPEG, PNG, etc.)
+                  description: Image file (JPEG, PNG, etc.)
       responses:
         '200':
-          description: Файл успешно загружен
+          description: File uploaded successfully
           content:
             application/json:
               schema:
@@ -46,26 +46,26 @@ paths:
                     type: string
                     example: "http://minio-bucket.s3.amazonaws.com/a1b2c3d4.jpg"
         '400':
-          description: Неверный формат файла
+          description: Invalid file format
         '500':
-          description: Ошибка сервера при загрузке
+          description: Server error during upload
 
   /api/v1/storage/{fileId}:
     get:
-      tags: [ Storage ]
-      summary: Скачать изображение
+      tags: [Storage]
+      summary: Download an image
       operationId: download
-      description: Возвращает файл изображения в виде бинарного потока (application/octet-stream).
+      description: Returns the image file as a binary stream (application/octet-stream).
       parameters:
         - in: path
           name: fileId
           required: true
           schema:
             type: string
-          description: Уникальный ID файла
+          description: Unique file ID
       responses:
         '200':
-          description: Файл найден
+          description: File found
           content:
             application/octet-stream:
               schema:
@@ -75,15 +75,15 @@ paths:
             Content-Disposition:
               schema:
                 type: string
-              description: Имя файла (например, "attachment; filename=image.jpg")
+              description: Filename (e.g., "attachment; filename=image.jpg")
         '404':
-          description: Файл не найден
+          description: File not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '500':
-          description: Ошибка сервера
+          description: Server error
           content:
             application/json:
               schema:
@@ -91,9 +91,9 @@ paths:
 
     delete:
       tags: [Storage]
-      summary: Удалить изображение
+      summary: Delete an image
       operationId: delete
-      description: Удаляет файл из хранилища.
+      description: Deletes a file from storage.
       parameters:
         - in: path
           name: fileId
@@ -102,18 +102,18 @@ paths:
             type: string
       responses:
         '204':
-          description: Файл успешно удален
+          description: File deleted successfully
         '404':
-          description: Файл не найден
+          description: File not found
         '500':
-          description: Ошибка сервера
+          description: Server error
 
   /api/v1/storage/{fileId}/metadata:
     get:
       tags: [Storage]
-      summary: Получить метаданные файла
+      summary: Get file metadata
       operationId: getMetadata
-      description: Возвращает метаданные (размер, формат, дата создания) изображения.
+      description: Returns metadata (size, format, creation date) of the image.
       parameters:
         - in: path
           name: fileId
@@ -122,7 +122,7 @@ paths:
             type: string
       responses:
         '200':
-          description: Метаданные получены
+          description: Metadata retrieved
           content:
             application/json:
               schema:
@@ -140,7 +140,7 @@ paths:
                     type: string
                     format: date-time
         '404':
-          description: Файл не найден
+          description: File not found
 
 components:
   schemas:
