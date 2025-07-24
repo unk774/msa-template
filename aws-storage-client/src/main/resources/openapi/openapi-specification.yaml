@@ -19,18 +19,22 @@ paths:
       tags: [Storage]
       summary: Upload an image
       operationId: upload
-      description: Uploads a file to S3/MinIO and returns its unique ID.
+      description: Uploads a file to S3/MinIO and returns its object key.
       requestBody:
         required: true
         content:
           multipart/form-data:
             schema:
               type: object
+              required: [file]
               properties:
                 file:
                   type: string
                   format: binary
                   description: Image file (JPEG, PNG, etc.)
+                objectKey:
+                  type: string
+                  description: Optional custom path/key for the object in S3 storage
       responses:
         '200':
           description: File uploaded successfully
@@ -39,30 +43,30 @@ paths:
               schema:
                 type: object
                 properties:
-                  fileId:
+                  objectKey:
                     type: string
-                    example: "a1b2c3d4-e5f6-7890"
+                    example: "images/profile/user123/avatar.jpg"
                   url:
                     type: string
-                    example: "http://minio-bucket.s3.amazonaws.com/a1b2c3d4.jpg"
+                    example: "http://minio-bucket.s3.amazonaws.com/images/profile/user123/avatar.jpg"
         '400':
           description: Invalid file format
         '500':
           description: Server error during upload
 
-  /api/v1/storage/{fileId}:
+  /api/v1/storage/download:
     get:
       tags: [Storage]
       summary: Download an image
       operationId: download
       description: Returns the image file as a binary stream (application/octet-stream).
       parameters:
-        - in: path
-          name: fileId
+        - in: query
+          name: objectKey
           required: true
           schema:
             type: string
-          description: Unique file ID
+          description: Object key/path in storage
       responses:
         '200':
           description: File found
@@ -89,17 +93,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
+  /api/v1/storage/delete:
     delete:
       tags: [Storage]
       summary: Delete an image
       operationId: delete
       description: Deletes a file from storage.
       parameters:
-        - in: path
-          name: fileId
+        - in: query
+          name: objectKey
           required: true
           schema:
             type: string
+          description: Object key/path in storage
       responses:
         '204':
           description: File deleted successfully
@@ -108,18 +114,19 @@ paths:
         '500':
           description: Server error
 
-  /api/v1/storage/{fileId}/metadata:
+  /api/v1/storage/metadata:
     get:
       tags: [Storage]
       summary: Get file metadata
       operationId: getMetadata
       description: Returns metadata (size, format, creation date) of the image.
       parameters:
-        - in: path
-          name: fileId
+        - in: query
+          name: objectKey
           required: true
           schema:
             type: string
+          description: Object key/path in storage
       responses:
         '200':
           description: Metadata retrieved
@@ -128,7 +135,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  fileId:
+                  objectKey:
                     type: string
                   size:
                     type: integer
@@ -142,6 +149,55 @@ paths:
         '404':
           description: File not found
 
+  /api/v1/storage/presigned-url:
+    get:
+      tags: [Storage]
+      summary: Get presigned URL for download
+      operationId: getPresignedUrl
+      description: Returns a time-limited presigned URL for downloading the file.
+      parameters:
+        - in: query
+          name: objectKey
+          required: true
+          schema:
+            type: string
+          description: Object key/path in storage
+        - in: query
+          name: expiresIn
+          schema:
+            type: integer
+            default: 3600
+            minimum: 60
+            maximum: 604800
+          description: URL expiration time in seconds (default 1 hour, max 7 days)
+      responses:
+        '200':
+          description: Presigned URL generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  url:
+                    type: string
+                    example: "https://bucket.s3.amazonaws.com/images/profile.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&..."
+                  expiresAt:
+                    type: string
+                    format: date-time
+                    example: "2023-01-01T12:00:00Z"
+        '404':
+          description: File not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
 components:
   schemas:
     ErrorResponse:
@@ -153,3 +209,10 @@ components:
         status:
           type: integer
           example: 404
+        message:
+          type: string
+          example: "The requested file does not exist"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2023-01-01T00:00:00Z"

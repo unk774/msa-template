@@ -1,22 +1,13 @@
 package ru.imageprocessing.aws_storage.service.s3;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.AbortMultipartUploadRequest;
-import software.amazon.awssdk.services.s3.model.CompleteMultipartUploadRequest;
-import software.amazon.awssdk.services.s3.model.CompletedMultipartUpload;
-import software.amazon.awssdk.services.s3.model.CompletedPart;
-import software.amazon.awssdk.services.s3.model.CreateMultipartUploadRequest;
-import software.amazon.awssdk.services.s3.model.CreateMultipartUploadResponse;
+import software.amazon.awssdk.services.s3.S3Configuration;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.DeleteObjectsRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectAttributesRequest;
@@ -28,31 +19,29 @@ import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.ObjectAttributes;
 import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectResponse;
-import software.amazon.awssdk.services.s3.model.UploadPartRequest;
-import software.amazon.awssdk.services.s3.model.UploadPartResponse;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.nio.ByteBuffer;
+import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Stream;
 
 @Service
 @Slf4j
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class S3Service {
+
+    @Value("${s3.service.endpoint:}")
+    private String serviceEndpoint;
+
+    @Value("${s3.forcePathStyle:false}")
+    private boolean forcePathStyle;
 
     private final S3Client s3Client;
 
@@ -129,7 +118,7 @@ public class S3Service {
                 .lastModified();
 
         return S3FileMetaData.builder()
-                .fileId(objectKey)
+                .objectKey(objectKey)
                 .format(FilenameUtils.getExtension(objectKey))
                 .size(getFileSize(bucketName, objectKey))
                 .lastModified(lastModified)
@@ -138,10 +127,34 @@ public class S3Service {
 
 
     public URL getUrl(String bucketName, String objectKey) throws MalformedURLException {
-        log.info("S3getUrl/{}",bucketName + "/" + objectKey);
+        log.info("S3getUrl/{}/{}", bucketName, objectKey);
         return s3Client.utilities().getUrl(GetUrlRequest.builder()
                 .bucket(bucketName)
                 .key(objectKey)
                 .build());
+    }
+
+    public URL getPresignedUrl(String bucketName, String objectKey, Long expiresIn) {
+        log.info("getPresignedUrl/{}/{}/{}", bucketName, objectKey, expiresIn);
+
+        try (S3Presigner presigner = S3Presigner.builder()
+                .region(s3Client.serviceClientConfiguration().region())
+                .endpointOverride(URI.create(serviceEndpoint))
+                .serviceConfiguration(S3Configuration.builder()
+                        .pathStyleAccessEnabled(forcePathStyle) // Required for MinIO
+                        .build())
+                .credentialsProvider(s3Client.serviceClientConfiguration().credentialsProvider())
+                .build()) {
+
+            GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                    .signatureDuration(Duration.ofSeconds(expiresIn))
+                    .getObjectRequest(GetObjectRequest.builder()
+                            .bucket(bucketName)
+                            .key(objectKey)
+                            .build())
+                    .build();
+
+            return presigner.presignGetObject(presignRequest).url();
+        }
     }
 }

@@ -14,6 +14,10 @@ import ru.imageprocessing.gateway.feign.UserRegistryClient;
 @EnableFeignClients(clients = {AuthClient.class, StoreClient.class, UserRegistryClient.class, NotificationClient.class})
 //TODO reactive webflux
 //TODO prometheus
+//TODO user registry cache
+//TODO user registry getByLogin checks
+//TODO tests
+//TODO notification message broker chanel
 public class GatewayApplication {
 
     public static void main(String[] args) {

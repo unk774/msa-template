@@ -1,5 +1,6 @@
 package ru.imageprocessing.auth.service;
 
+import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,10 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.imageprocessing.auth.api.dto.RegisterUserRequest;
+import ru.imageprocessing.auth.api.dto.UserResponse;
+import ru.imageprocessing.auth.mapper.UserRepresentationMapper;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +23,7 @@ import ru.imageprocessing.auth.api.dto.RegisterUserRequest;
 public class UserRegistry {
 
     private final Keycloak keycloak;
+    private final UserRepresentationMapper userRepresentationMapper;
 
     @Value("${keycloak.realm}")
     private String realm;
@@ -53,5 +59,24 @@ public class UserRegistry {
 
             return response.getStatus();
         }
+    }
+
+    public UserResponse getUserByLogin(String login) {
+        RealmResource realmResource = keycloak.realm(realm);
+        UsersResource usersResource = realmResource.users();
+
+        // get by login
+        List<UserRepresentation> users = usersResource.searchByUsername(login, true);
+
+        if (users.isEmpty()) {
+            throw new NotFoundException("User with login " + login + " not found");
+        }
+
+        UserRepresentation user = users.get(0);
+
+        // get attributes
+        UserRepresentation fullUser = usersResource.get(user.getId()).toRepresentation();
+
+        return userRepresentationMapper.toUserResponse(fullUser);
     }
 }

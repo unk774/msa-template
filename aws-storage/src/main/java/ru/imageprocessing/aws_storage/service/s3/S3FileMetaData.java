@@ -9,7 +9,7 @@ import java.time.Instant;
 @Getter
 public class S3FileMetaData {
 
-    private final String fileId;
+    private final String objectKey;
     private final long size;
     private final String format;
     private final Instant lastModified;

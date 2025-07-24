@@ -1,0 +1,61 @@
+openapi: 3.0.0
+info:
+  title: Gateway API
+  description: Main entry point for file uploads and notifications
+  version: 1.0.0
+servers:
+  - url: http://localhost:8082/api/v1
+    description: Local development
+  - url: https://api.your-gateway.com/api/v1
+    description: Production gateway
+
+tags:
+  - name: Aggregate
+    description: Gateway aggregation operations
+
+paths:
+  /api/v1/aggregate/uploadAndNotify:
+    post:
+      tags: [Aggregate]
+      summary: Upload a file via Gateway and notifies user
+      operationId: uploadAndNotify
+      description: |
+        Proxies the file upload to the Storage Service and sends notification
+        Returns the file ID and URL.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: File to upload (e.g., JPEG, PNG, PDF)
+      responses:
+        '200':
+          description: File uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  objectKey:
+                    type: string
+                    example: "a1b2c3d4-e5f6-7890"
+                  url:
+                    type: string
+                    example: "http://minio-bucket.s3.amazonaws.com/a1b2c3d4.jpg"
+        '400':
+          description: Invalid file format or request
+        '502':
+          description: Storage Service unavailable
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Failed to proxy request to Storage Service"

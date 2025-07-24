@@ -18,6 +18,11 @@ public class UsersController implements UsersApi {
     private final UserRegistryClient userRegistryClient;
 
     @Override
+    public ResponseEntity<UserResponse> getUserByLogin(String login) {
+        return userRegistryClient.getUserByLogin(login);
+    }
+
+    @Override
     public ResponseEntity<UserResponse> registerUser(RegisterUserRequest registerUserRequest) {
         return userRegistryClient.registerUser(registerUserRequest);
     }

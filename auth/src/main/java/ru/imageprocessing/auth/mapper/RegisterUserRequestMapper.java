@@ -10,7 +10,7 @@ import java.time.Instant;
 import java.util.Date;
 
 @Mapper(componentModel = "spring")
-public interface UserResponseMapper {
+public interface RegisterUserRequestMapper {
     UserResponse toResponse(RegisterUserRequest request);
 
     @AfterMapping
