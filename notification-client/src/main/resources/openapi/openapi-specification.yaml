@@ -12,8 +12,9 @@ paths:
     post:
       tags:
         - notifications
+      operationId: sendNotification
       summary: Create and send notification text to recipient
-      description: Create notification
+      description: Send notification
       requestBody:
         required: true
         content:

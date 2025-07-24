@@ -1,4 +1,4 @@
-package ru.imageprocessing.auth;
+package ru.imageprocessing.notification;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

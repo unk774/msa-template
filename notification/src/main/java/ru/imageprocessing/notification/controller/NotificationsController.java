@@ -22,7 +22,7 @@ public class NotificationsController implements NotificationsApi {
     private final NotificationsService notificationsService;
 
     @Override
-    public ResponseEntity<Void> notificationsPost(UniversalNotification universalNotification) {
+    public ResponseEntity<Void> sendNotification(UniversalNotification universalNotification) {
         log.info("Creating notification by template code: %s from user: %s"
                 .formatted(universalNotification.getMetaInfo().getTemplateCode(), MDC.get(MDCConfiguration.MDC_KEY)));
         notificationsService.createNotification(universalNotification);

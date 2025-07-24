@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import ru.imageprocessing.aws_storage.api.StorageApi;
-import ru.imageprocessing.aws_storage.api.dto.ApiV1StorageFileIdMetadataGet200Response;
-import ru.imageprocessing.aws_storage.api.dto.ApiV1StorageUploadPost200Response;
+import ru.imageprocessing.aws_storage.api.dto.GetMetadata200Response;
+import ru.imageprocessing.aws_storage.api.dto.Upload200Response;
 import ru.imageprocessing.gateway.feign.StoreClient;
 
 @RequiredArgsConstructor
@@ -19,22 +19,22 @@ public class StoreController implements StorageApi {
     private final StoreClient storeClient;
 
     @Override
-    public ResponseEntity<Void> apiV1StorageFileIdDelete(String fileId) {
-        return storeClient.apiV1StorageFileIdDelete(fileId);
+    public ResponseEntity<Void> delete(String fileId) {
+        return storeClient.delete(fileId);
     }
 
     @Override
-    public ResponseEntity<StreamingResponseBody> apiV1StorageFileIdGet(String fileId) {
-        return storeClient.apiV1StorageFileIdGet(fileId);
+    public ResponseEntity<StreamingResponseBody> download(String fileId) {
+        return storeClient.download(fileId);
     }
 
     @Override
-    public ResponseEntity<ApiV1StorageFileIdMetadataGet200Response> apiV1StorageFileIdMetadataGet(String fileId) {
-        return storeClient.apiV1StorageFileIdMetadataGet(fileId);
+    public ResponseEntity<GetMetadata200Response> getMetadata(String fileId) {
+        return storeClient.getMetadata(fileId);
     }
 
     @Override
-    public ResponseEntity<ApiV1StorageUploadPost200Response> apiV1StorageUploadPost(MultipartFile file) {
-        return storeClient.apiV1StorageUploadPost(file);
+    public ResponseEntity<Upload200Response> upload(MultipartFile file) {
+        return storeClient.upload(file);
     }
 }

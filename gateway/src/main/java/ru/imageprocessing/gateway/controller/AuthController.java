@@ -19,12 +19,12 @@ public class AuthController implements AuthApi {
     private final AuthClient authClient;
 
     @Override
-    public ResponseEntity<AuthResponse> apiV1AuthLoginPost(LoginRequest loginRequest) {
-        return authClient.apiV1AuthLoginPost(loginRequest);
+    public ResponseEntity<AuthResponse> getToken(LoginRequest loginRequest) {
+        return authClient.getToken(loginRequest);
     }
 
     @Override
-    public ResponseEntity<AuthResponse> apiV1AuthRefreshPost(RefreshTokenRequest refreshTokenRequest) {
-        return authClient.apiV1AuthRefreshPost(refreshTokenRequest);
+    public ResponseEntity<AuthResponse> refreshToken(RefreshTokenRequest refreshTokenRequest) {
+        return authClient.refreshToken(refreshTokenRequest);
     }
 }

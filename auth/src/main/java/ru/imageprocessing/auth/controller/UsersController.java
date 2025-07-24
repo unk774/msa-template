@@ -20,7 +20,7 @@ public class UsersController implements UsersApi {
     private final UserResponseMapper userResponseMapper;
 
     @Override
-    public ResponseEntity<UserResponse> apiV1UsersRegisterPost(RegisterUserRequest registerUserRequest) {
+    public ResponseEntity<UserResponse> registerUser(RegisterUserRequest registerUserRequest) {
         Integer response = userRegistry.createUser(registerUserRequest);
         if (response != 201) {
             return ResponseEntity.status(response).build();

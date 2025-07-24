@@ -18,6 +18,7 @@ paths:
     post:
       tags: [Storage]
       summary: Загрузить изображение
+      operationId: upload
       description: Загружает файл в S3/MinIO и возвращает его уникальный ID.
       requestBody:
         required: true
@@ -53,6 +54,7 @@ paths:
     get:
       tags: [ Storage ]
       summary: Скачать изображение
+      operationId: download
       description: Возвращает файл изображения в виде бинарного потока (application/octet-stream).
       parameters:
         - in: path
@@ -90,6 +92,7 @@ paths:
     delete:
       tags: [Storage]
       summary: Удалить изображение
+      operationId: delete
       description: Удаляет файл из хранилища.
       parameters:
         - in: path
@@ -109,6 +112,7 @@ paths:
     get:
       tags: [Storage]
       summary: Получить метаданные файла
+      operationId: getMetadata
       description: Возвращает метаданные (размер, формат, дата создания) изображения.
       parameters:
         - in: path

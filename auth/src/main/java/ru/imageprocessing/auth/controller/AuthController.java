@@ -22,7 +22,7 @@ public class AuthController implements AuthApi {
     private final Auth auth;
 
     @Override
-    public ResponseEntity<AuthResponse> apiV1AuthLoginPost(LoginRequest loginRequest) {
+    public ResponseEntity<AuthResponse> getToken(LoginRequest loginRequest) {
         try {
             return ResponseEntity.ok(auth.login(loginRequest));
         } catch (NotAuthorizedException e) {
@@ -31,7 +31,7 @@ public class AuthController implements AuthApi {
     }
 
     @Override
-    public ResponseEntity<AuthResponse> apiV1AuthRefreshPost(RefreshTokenRequest refreshTokenRequest) {
+    public ResponseEntity<AuthResponse> refreshToken(RefreshTokenRequest refreshTokenRequest) {
         return ResponseEntity.ok(auth.refreshToken(refreshTokenRequest.getRefreshToken()));
     }
 }
