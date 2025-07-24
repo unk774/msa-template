@@ -1,0 +1,67 @@
+server:
+  port: ${SERVER_PORT:8083}
+  error:
+    include-message: always
+    include-exception: true
+
+spring:
+  application:
+    name: ${APP_NAME:auth}
+  tomcat:
+    threads:
+      max: 300
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${AUTH_SERVER_URL:http://keycloak:8880}/realms/${AUTH_SERVER_REALM:image-processing}
+          jwk-set-uri:  ${AUTH_SERVER_URL:http://keycloak:8880}/realms/${AUTH_SERVER_REALM:image-processing}/protocol/openid-connect/certs
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:2525}
+    username: ${MAIL_USERNAME:nouser@noreply.com}
+    password: ${MAIL_PASSWORD:nouser}
+    properties:
+      mail:
+        transport:
+          protocol: smtp
+        debug: ${MAIL_DEBUG:true}
+        smtp:
+          auth: ${MAIL_AUTH:true}
+          starttls:
+            enable: ${MAIL_START_TLS:false}
+          localhost: ${MAIL_LOCALHOST:localhost.localhost}
+
+keycloak:
+  auth-server-url: ${AUTH_SERVER_URL:http://keycloak:8880}
+  realm: ${AUTH_SERVER_REALM:image-processing}
+  client-id: ${AUTH_SERVER_CLIENT_ID:image-processing-admin}
+  client-secret: ${AUTH_SERVER_CLIENT_SECRET:kqDoa2+jTLpdO5Ab4yqAAqrcDN7AvMXe}
+
+
+s3:
+  access:
+    key: ${S3_ACCESS_KEY:admin}
+  secret:
+    key: ${S3_SECRET_KEY:admin123}
+  service:
+    endpoint: ${S3_ENDPOINT:http://localhost:9000}
+  signing:
+    region: ${S3_REGION:us-east-1}
+  forcePathStyle: ${S3_PATH_STYLE:true}
+  templates-bucket: ${S3_STORE_BUCKET:notifications}
+
+springdoc:
+  api-docs:
+    path: /api-docs/notification/v3/api-docs
+  swagger-ui:
+    path: /api-docs/notification/swagger-ui
+    display-request-duration: true
+    disable-swagger-default-url: true
+    urls:
+      - name: notification
+        url: ${API_URL:http://localhost:8083}/api-docs/notification/v3/api-docs
+    urls-primary-name: notification
+    url:  ${PUBLIC_URL:http://localhost:8083}/
+  show-actuator: false
+  enable-groovy: false

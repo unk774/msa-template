@@ -1,5 +1,6 @@
 package ru.imageprocessing.auth.controller;
 
+import jakarta.ws.rs.NotAuthorizedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,11 @@ public class AuthController implements AuthApi {
 
     @Override
     public ResponseEntity<AuthResponse> apiV1AuthLoginPost(LoginRequest loginRequest) {
-        return ResponseEntity.ok(auth.login(loginRequest));
+        try {
+            return ResponseEntity.ok(auth.login(loginRequest));
+        } catch (NotAuthorizedException e) {
+            return ResponseEntity.status(401).build();
+        }
     }
 
     @Override

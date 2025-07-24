@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.3.3'
+    id 'org.springframework.boot' version '3.5.3'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'com.google.cloud.tools.jib' version '3.4.2'
 }
@@ -31,16 +31,21 @@ repositories {
 }
 
 dependencies {
-    implementation project(':auth-client')
-    implementation project(':aws-storage-client')
+    implementation project(':notification-client')
 
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.2'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.keycloak:keycloak-admin-client:24.0.1'
     implementation 'commons-io:commons-io:2.15.1'
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+
+    implementation 'software.amazon.awssdk:s3:2.25.27'
+    implementation 'org.apache.httpcomponents.client5:httpclient5-parent:5.3.1'
+    implementation 'com.sun.mail:jakarta.mail:2.0.1'
+    implementation 'org.eclipse.angus:angus-mail:2.0.3'
 
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-api:2.5.0'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'

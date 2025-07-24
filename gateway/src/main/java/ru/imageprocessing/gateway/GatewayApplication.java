@@ -12,6 +12,8 @@ import ru.imageprocessing.gateway.feign.UserRegistryClient;
 @EnableWebSecurity
 @EnableFeignClients(clients = {AuthClient.class, StoreClient.class, UserRegistryClient.class})
 //TODO reactive webflux
+//TODO prometheus
+//TODO add operationId to openapi
 public class GatewayApplication {
 
     public static void main(String[] args) {

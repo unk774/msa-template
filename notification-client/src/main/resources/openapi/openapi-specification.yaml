@@ -1,0 +1,115 @@
+openapi: 3.0.0
+info:
+  title: notifications
+  version: '1.0'
+  description: Описание методов API для сервиса уведомлений
+tags:
+  - name: notifications
+    description: Уведомления
+
+paths:
+  /notifications:
+    post:
+      tags:
+        - notifications
+      summary: Create and send notification text to recipient
+      description: Create notification
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UniversalNotification'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    UniversalNotification:
+      title: Universal Notification Entity
+      type: object
+      description: Entity which stores data for notifications.
+      required:
+        - metaInfo
+        - data
+      properties:
+        metaInfo:
+          $ref: '#/components/schemas/MetaInfo'
+        data:
+          type: object
+          additionalProperties: true
+
+    MetaInfo:
+      title: Technical information about notification
+      type: object
+      required:
+        - notificationChannel
+        - date
+        - recipient
+        - sender
+        - subject
+        - templateCode
+        - templateFormat
+      properties:
+        notificationChannel:
+          type: string
+          description: Notification channel
+          example: EMAIL
+          enum:
+            - EMAIL
+        date:
+          type: string
+          format: date-time
+          description: Current date
+          example: '2022-10-07'
+        sender:
+          type: string
+          description: Sender
+          example: 'noreply@mail.ru'
+        recipient:
+          type: string
+          description: Recipient
+          example: 'user@mail.ru'
+        subject:
+          type: string
+          description: Subject
+          example: 'subject'
+        templateCode:
+          type: string
+          description: Template Code
+          example: 'downloadLink'
+        templateFormat:
+          type: string
+          description: Output template format
+          example: HTML
+          enum:
+            - HTML
+            - TXT
+    ErrorResponse:
+      description: Ответ с ошибкой
+      title: ErrorResponse
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorBody'
+
+    ErrorBody:
+      description: Тело ошибки
+      title: ErrorBody
+      type: object
+      properties:
+        code:
+          type: integer
+          description: Error code
+          example: 404
+        message:
+          type: string
+          description: Error message
+          example: 'Exception when processing http request'
