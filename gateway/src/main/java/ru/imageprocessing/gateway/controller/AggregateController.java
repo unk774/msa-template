@@ -45,7 +45,7 @@ public class AggregateController implements AggregateApi {
 
         UserResponse user = userRegistryClient.getUserByLogin(MDC.get(MDC_KEY)).getBody();
 
-        String presignedUrl = storeClient.getPresignedUrl(URLEncoder.encode(objectKey, StandardCharsets.UTF_8), 900L).getBody().getUrl();
+        String presignedUrl = storeClient.getPresignedUrl(objectKey, 900L).getBody().getUrl();
         var response = new UploadAndNotify200Response();
         response.setUrl(presignedUrl);
         response.setObjectKey(objectKey);

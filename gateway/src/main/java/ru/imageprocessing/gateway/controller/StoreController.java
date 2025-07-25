@@ -30,31 +30,7 @@ public class StoreController implements StorageApi {
 
     @Override
     public ResponseEntity<StreamingResponseBody> download(String objectKey) {
-        var response = storeClient.downloadAsStream(objectKey);
-        if (response.status() != 200) {
-            return ResponseEntity.status(response.status()).build();
-        }
-
-        var headers = new HttpHeaders();
-        var okResponse = ResponseEntity.ok();
-
-        headers.set(HttpHeaders.CONTENT_DISPOSITION, response.headers().get(HttpHeaders.CONTENT_DISPOSITION).stream().findFirst().orElse(null));
-        headers.set(HttpHeaders.CONTENT_LENGTH, response.headers().get(HttpHeaders.CONTENT_LENGTH).stream().findFirst().orElse(null));
-
-        return okResponse
-                .headers(headers)
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body((outputStream) -> {
-            try (var is = response.body().asInputStream()){
-                byte[] buffer = new byte[8192];
-                int bytesRead;
-                while ((bytesRead = is.read(buffer)) != -1) {
-                    outputStream.write(buffer, 0, bytesRead);
-                }
-            } catch (IOException ioException) {
-                log.error("error reading download stream", ioException);
-            }
-        });
+        return storeClient.download(objectKey);
     }
 
     @Override
