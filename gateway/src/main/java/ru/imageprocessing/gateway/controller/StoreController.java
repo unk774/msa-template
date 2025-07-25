@@ -24,7 +24,6 @@ public class StoreController implements StorageApi {
     private final StoreClient storeClient;
 
     @Override
-    //TODO not found handling
     public ResponseEntity<Void> delete(String objectKey) {
         return storeClient.delete(objectKey);
     }
