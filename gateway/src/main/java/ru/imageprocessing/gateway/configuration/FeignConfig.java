@@ -1,6 +1,7 @@
 package ru.imageprocessing.gateway.configuration;
 
 import feign.RequestInterceptor;
+import feign.RequestTemplate;
 import feign.Response;
 import feign.Retryer;
 import feign.codec.ErrorDecoder;
@@ -8,7 +9,9 @@ import jakarta.ws.rs.ClientErrorException;
 import jakarta.ws.rs.ServerErrorException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import ru.imageprocessing.gateway.feign.BearerTokenInterceptor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import static feign.FeignException.errorStatus;
 
@@ -30,6 +33,19 @@ public class FeignConfig {
                 );
             }
             return errorStatus(methodKey, response);
+        }
+    }
+
+    public static class BearerTokenInterceptor implements RequestInterceptor {
+
+        @Override
+        public void apply(RequestTemplate template) {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            if (authentication != null && authentication.getCredentials() instanceof Jwt) {
+                Jwt jwt = (Jwt) authentication.getCredentials();
+                template.header("Authorization", "Bearer " + jwt.getTokenValue());
+            }
         }
     }
 
