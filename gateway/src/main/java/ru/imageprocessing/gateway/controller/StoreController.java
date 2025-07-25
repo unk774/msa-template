@@ -2,6 +2,8 @@ package ru.imageprocessing.gateway.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,8 +14,7 @@ import ru.imageprocessing.aws_storage.api.dto.GetPresignedUrl200Response;
 import ru.imageprocessing.aws_storage.api.dto.Upload200Response;
 import ru.imageprocessing.gateway.feign.StoreClient;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.io.IOException;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -29,9 +30,32 @@ public class StoreController implements StorageApi {
     }
 
     @Override
-    //TODO feign cant handle StreamingResponseBody
     public ResponseEntity<StreamingResponseBody> download(String objectKey) {
-        return storeClient.download(objectKey);
+        var response = storeClient.downloadAsStream(objectKey);
+        if (response.status() != 200) {
+            return ResponseEntity.status(response.status()).build();
+        }
+
+        var headers = new HttpHeaders();
+        var okResponse = ResponseEntity.ok();
+
+        headers.set(HttpHeaders.CONTENT_DISPOSITION, response.headers().get(HttpHeaders.CONTENT_DISPOSITION).stream().findFirst().orElse(null));
+        headers.set(HttpHeaders.CONTENT_LENGTH, response.headers().get(HttpHeaders.CONTENT_LENGTH).stream().findFirst().orElse(null));
+
+        return okResponse
+                .headers(headers)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body((outputStream) -> {
+            try (var is = response.body().asInputStream()){
+                byte[] buffer = new byte[8192];
+                int bytesRead;
+                while ((bytesRead = is.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+            } catch (IOException ioException) {
+                log.error("error reading download stream", ioException);
+            }
+        });
     }
 
     @Override
