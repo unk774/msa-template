@@ -1,0 +1,71 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'org.springframework.boot' version '3.3.3' apply false
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'ru.imageprocessing'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs += "$buildDir/generated/src/main/java"
+        }
+    }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES
+    }
+}
+
+
+dependencies {
+    compileOnly 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    compileOnly 'org.springframework.boot:spring-boot-starter-security'
+    compileOnly 'org.springframework.boot:spring-boot-starter-web'
+
+    compileOnly 'org.keycloak:keycloak-admin-client:24.0.1'
+
+    compileOnly 'org.springdoc:springdoc-openapi-starter-webmvc-api:2.5.0'
+    compileOnly 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+    compileOnly 'org.springdoc:springdoc-openapi-starter-common:2.5.0'
+
+    compileOnly 'software.amazon.awssdk:s3:2.25.27'
+
+    compileOnly 'org.projectlombok:lombok'
+
+    annotationProcessor 'org.projectlombok:lombok'
+}
+
+
+tasks.build.finalizedBy(publishToMavenLocal)
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifactId = 'common'
+            from components.java
+        }
+    }
+}

@@ -1,4 +1,4 @@
-package ru.imageprocessing.gateway.configuration;
+package ru.imageprocessing.common.configuration;
 
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;

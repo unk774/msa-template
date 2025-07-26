@@ -1,4 +1,4 @@
-package ru.imageprocessing.aws_storage.configuration;
+package ru.imageprocessing.common.configuration;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

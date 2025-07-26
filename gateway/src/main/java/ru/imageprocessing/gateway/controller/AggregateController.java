@@ -20,7 +20,8 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
 
-import static ru.imageprocessing.gateway.configuration.MDCConfiguration.MDC_USER;
+import static ru.imageprocessing.common.configuration.MDCConfiguration.MDC_USER;
+
 
 @RequiredArgsConstructor
 @Slf4j

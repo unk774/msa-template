@@ -1,4 +1,4 @@
-package ru.imageprocessing.aws_storage.configuration;
+package ru.imageprocessing.common.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

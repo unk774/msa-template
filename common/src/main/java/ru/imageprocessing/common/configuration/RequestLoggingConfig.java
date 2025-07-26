@@ -1,4 +1,4 @@
-package ru.imageprocessing.gateway.configuration;
+package ru.imageprocessing.common.configuration;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.web.filter.AbstractRequestLoggingFilter;
 
-import static ru.imageprocessing.gateway.configuration.MDCConfiguration.MDC_USER;
-import static ru.imageprocessing.gateway.configuration.MDCConfiguration.MDC_USER_ROLES;
+import static ru.imageprocessing.common.configuration.MDCConfiguration.MDC_USER;
+import static ru.imageprocessing.common.configuration.MDCConfiguration.MDC_USER_ROLES;
 
 @Configuration
 public class RequestLoggingConfig {

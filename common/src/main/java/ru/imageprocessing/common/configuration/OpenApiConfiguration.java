@@ -1,4 +1,4 @@
-package ru.imageprocessing.notification.configuration;
+package ru.imageprocessing.common.configuration;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -12,8 +12,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenApiConfiguration {
 
-    @Value("${PUBLIC_URL:http://localhost:8083}")
+    @Value("${springdoc.swagger-ui.url:http://localhost}")
     private String publicUrl;
+
+    @Value("${springdoc.swagger-ui.urls-primary-name:service}")
+    private String description;
 
     @Bean
     public OpenAPI customOpenAPI() {
@@ -24,6 +27,6 @@ public class OpenApiConfiguration {
                                 .scheme("bearer")
                                 .bearerFormat("JWT")))
                 .addSecurityItem(new SecurityRequirement().addList("bearerAuth"))
-                .addServersItem(new Server().url(publicUrl).description("stand"));
+                .addServersItem(new Server().url(publicUrl).description(description));
     }
 }
