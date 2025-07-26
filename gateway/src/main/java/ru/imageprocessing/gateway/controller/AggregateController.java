@@ -29,8 +29,6 @@ import static ru.imageprocessing.common.configuration.MDCConfiguration.MDC_USER;
 public class AggregateController implements AggregateApi {
 
     private final StoreClient storeClient;
-    private final NotificationClient notificationClient;
-    private final UserRegistryClient userRegistryClient;
 
     @Override
     public ResponseEntity<UploadAndNotify200Response> uploadAndNotify(MultipartFile file) {
@@ -39,38 +37,12 @@ public class AggregateController implements AggregateApi {
         }
 
         String objectKey = MDC.get(MDC_USER) + "/" + file.getOriginalFilename();
-
         storeClient.upload(file, objectKey).getBody();
-
-        UserResponse user = userRegistryClient.getUserByLogin(MDC.get(MDC_USER)).getBody();
 
         String presignedUrl = storeClient.getPresignedUrl(objectKey, 900L).getBody().getUrl();
         var response = new UploadAndNotify200Response();
         response.setUrl(presignedUrl);
         response.setObjectKey(objectKey);
-
-        //reply if email empty
-        if (StringUtils.isBlank(user.getEmail())) {
-            return ResponseEntity.ok(response);
-        }
-
-        //send notification
-        MetaInfo metaInfo = new MetaInfo();
-        metaInfo.setNotificationChannel(MetaInfo.NotificationChannelEnum.EMAIL);
-        metaInfo.setSender("noreply@noreply");
-        metaInfo.setRecipient(user.getEmail());
-        metaInfo.setDate(Date.from(Instant.now()));
-        metaInfo.setSubject("Uploaded image link");
-        metaInfo.setTemplateFormat(MetaInfo.TemplateFormatEnum.HTML);
-        metaInfo.setTemplateCode("notification-template.html");
-
-        UniversalNotification universalNotification = new UniversalNotification();
-        universalNotification.setMetaInfo(metaInfo);
-
-        universalNotification.setData(Map.of("firstName", StringUtils.defaultIfBlank(user.getFirstName(),""),
-                "lastName", StringUtils.defaultIfBlank(user.getLastName(),""),
-                "downloadLink", presignedUrl));
-        notificationClient.sendNotification(universalNotification);
 
         return ResponseEntity.ok(response);
     }
