@@ -16,13 +16,11 @@ import ru.imageprocessing.gateway.feign.UserRegistryClient;
 import ru.imageprocessing.notification.api.dto.MetaInfo;
 import ru.imageprocessing.notification.api.dto.UniversalNotification;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
 
-import static ru.imageprocessing.gateway.configuration.MDCConfiguration.MDC_KEY;
+import static ru.imageprocessing.gateway.configuration.MDCConfiguration.MDC_USER;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -35,15 +33,15 @@ public class AggregateController implements AggregateApi {
 
     @Override
     public ResponseEntity<UploadAndNotify200Response> uploadAndNotify(MultipartFile file) {
-        if (StringUtils.isBlank(MDC.get(MDC_KEY))) {
+        if (StringUtils.isBlank(MDC.get(MDC_USER))) {
             throw new RuntimeException("user not found in MDC");
         }
 
-        String objectKey = MDC.get(MDC_KEY) + "/" + file.getOriginalFilename();
+        String objectKey = MDC.get(MDC_USER) + "/" + file.getOriginalFilename();
 
         storeClient.upload(file, objectKey).getBody();
 
-        UserResponse user = userRegistryClient.getUserByLogin(MDC.get(MDC_KEY)).getBody();
+        UserResponse user = userRegistryClient.getUserByLogin(MDC.get(MDC_USER)).getBody();
 
         String presignedUrl = storeClient.getPresignedUrl(objectKey, 900L).getBody().getUrl();
         var response = new UploadAndNotify200Response();
