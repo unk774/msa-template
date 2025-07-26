@@ -32,13 +32,18 @@ repositories {
 
 dependencies {
     implementation project(':common')
+    implementation project(':aws-storage-client')
     implementation project(':notification-client')
+    implementation project(':auth-client')
 
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.cloud:spring-cloud-stream-binder-rabbit:4.3.0'
+    implementation 'org.springframework.cloud:spring-cloud-starter-stream-rabbit:4.3.0'
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.3.0'
     implementation 'org.keycloak:keycloak-admin-client:24.0.1'
     implementation 'commons-io:commons-io:2.15.1'
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'

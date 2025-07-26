@@ -16,6 +16,18 @@ spring:
         jwt:
           issuer-uri: ${AUTH_SERVER_URL:http://keycloak:8880}/realms/${AUTH_SERVER_REALM:image-processing}
           jwk-set-uri:  ${AUTH_SERVER_URL:http://keycloak:8880}/realms/${AUTH_SERVER_REALM:image-processing}/protocol/openid-connect/certs
+  rabbitmq:
+    host: ${RABBIT_HOST:localhost}
+    port: ${RABBIT_PORT:5672}
+    username: ${RABBIT_USERNAME:admin}
+    password: ${RABBIT_PASSWORD:password}
+  cloud:
+    stream:
+      bindings:
+        # Define an output channel (producer)
+        upload-out-0:
+          destination: upload-exchange
+          binder: rabbit
 
 keycloak:
   auth-server-url: ${AUTH_SERVER_URL:http://keycloak:8880}

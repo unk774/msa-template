@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -17,12 +18,16 @@ import ru.imageprocessing.aws_storage.api.dto.GetMetadata200Response;
 import ru.imageprocessing.aws_storage.api.dto.GetPresignedUrl200Response;
 import ru.imageprocessing.aws_storage.api.dto.Upload200Response;
 import ru.imageprocessing.aws_storage.mapper.S3MetadataMapper;
+import ru.imageprocessing.aws_storage.messaging.FileUploadedDto;
+import ru.imageprocessing.aws_storage.messaging.MessageSenderService;
 import ru.imageprocessing.aws_storage.service.s3.S3RetriableDownloader;
 import ru.imageprocessing.aws_storage.service.s3.S3Service;
 
 import java.io.IOException;
 import java.time.Instant;
 import java.util.Date;
+
+import static ru.imageprocessing.common.configuration.MDCConfiguration.MDC_USER;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -31,6 +36,7 @@ public class S3StorageController implements StorageApi {
 
     final S3Service s3Service;
     final S3MetadataMapper s3MetadataMapper;
+    final MessageSenderService senderService;
 
 
     @Value("${s3.store-bucket:store}")
@@ -87,6 +93,11 @@ public class S3StorageController implements StorageApi {
             Upload200Response response = new Upload200Response();
             response.setObjectKey(objectKey_);
             response.setUrl(s3Service.getUrl(s3StoreBucket, objectKey_).toExternalForm());
+            senderService.sendFileUploaded(new FileUploadedDto(
+                    MDC.get(MDC_USER),
+                    s3Service.getUrl(s3StoreBucket, objectKey_).toExternalForm(),
+                    s3Service.getPresignedUrl(s3StoreBucket, objectKey_, 3600L).toExternalForm()
+            ));
             return ResponseEntity.ok(response);
         } catch (IOException e) {
             throw new RuntimeException(e);

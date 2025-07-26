@@ -31,6 +31,24 @@ spring:
           starttls:
             enable: ${MAIL_START_TLS:false}
           localhost: ${MAIL_LOCALHOST:localhost.localhost}
+  rabbitmq:
+    host: ${RABBIT_HOST:localhost}
+    port: ${RABBIT_PORT:5672}
+    username: ${RABBIT_USERNAME:admin}
+    password: ${RABBIT_PASSWORD:password}
+  cloud:
+    stream:
+      bindings:
+        # Define an input channel (consumer)
+        upload-in-0:
+          destination: upload-exchange
+          group: ${spring.application.name}-group
+          binder: rabbit
+      rabbit:
+        bindings:
+          inputChannel:
+            consumer:
+              requeueRejected: false # Do not re-queue rejected messages
 
 keycloak:
   auth-server-url: ${AUTH_SERVER_URL:http://keycloak:8880}
@@ -38,6 +56,9 @@ keycloak:
   client-id: ${AUTH_SERVER_CLIENT_ID:image-processing-admin}
   client-secret: ${AUTH_SERVER_CLIENT_SECRET:kqDoa2+jTLpdO5Ab4yqAAqrcDN7AvMXe}
 
+feign:
+  auth:
+    url: ${AUTH_URL:http://localhost:8081}
 
 s3:
   access:
