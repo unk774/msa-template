@@ -13,12 +13,13 @@ import ru.imageprocessing.gateway.feign.NotificationClient;
 import ru.imageprocessing.gateway.feign.StoreClient;
 import ru.imageprocessing.gateway.feign.UserRegistryClient;
 import ru.imageprocessing.common.configuration.MDCConfiguration;
+import ru.imageprocessing.common.configuration.feign.FeignConfig;
 
 @SpringBootApplication
 @EnableWebSecurity
 @EnableFeignClients(clients = {AuthClient.class, StoreClient.class, UserRegistryClient.class, NotificationClient.class})
-@Import({MDCConfiguration.class, RequestLoggingConfig.class, KeycloakConfiguration.class, OpenApiConfiguration.class})
-//TODO notification message broker chanel
+@Import({MDCConfiguration.class, RequestLoggingConfig.class, KeycloakConfiguration.class,
+        OpenApiConfiguration.class, FeignConfig.class})
 //TODO user registry getByLogin checks
 //TODO reactive webflux
 //TODO prometheus

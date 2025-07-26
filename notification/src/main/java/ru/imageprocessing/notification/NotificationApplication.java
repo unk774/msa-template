@@ -10,13 +10,14 @@ import ru.imageprocessing.common.configuration.MDCConfiguration;
 import ru.imageprocessing.common.configuration.OpenApiConfiguration;
 import ru.imageprocessing.common.configuration.RequestLoggingConfig;
 import ru.imageprocessing.common.configuration.S3Configuration;
+import ru.imageprocessing.common.configuration.feign.FeignConfig;
 import ru.imageprocessing.notification.feign.UserRegistryClient;
 
 @SpringBootApplication
 @EnableWebSecurity
 @EnableFeignClients(clients = {UserRegistryClient.class})
 @Import({MDCConfiguration.class, RequestLoggingConfig.class, KeycloakConfiguration.class,
-        OpenApiConfiguration.class, S3Configuration.class})
+        OpenApiConfiguration.class, S3Configuration.class, FeignConfig.class})
 public class NotificationApplication {
 
     public static void main(String[] args) {

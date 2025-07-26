@@ -1,4 +1,4 @@
-package ru.imageprocessing.gateway.configuration.feign;
+package ru.imageprocessing.common.configuration.feign;
 
 import feign.Feign;
 import feign.Logger;

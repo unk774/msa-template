@@ -44,6 +44,9 @@ dependencies {
     compileOnly 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
     compileOnly 'org.springframework.boot:spring-boot-starter-security'
     compileOnly 'org.springframework.boot:spring-boot-starter-web'
+    compileOnly 'org.springframework.cloud:spring-cloud-stream-binder-rabbit:4.3.0'
+    compileOnly 'org.springframework.cloud:spring-cloud-starter-stream-rabbit:4.3.0'
+    compileOnly 'org.springframework.cloud:spring-cloud-starter-openfeign:4.3.0'
 
     compileOnly 'org.keycloak:keycloak-admin-client:24.0.1'
 

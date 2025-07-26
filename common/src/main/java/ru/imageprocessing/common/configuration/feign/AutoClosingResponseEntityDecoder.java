@@ -1,4 +1,4 @@
-package ru.imageprocessing.notification.configuration.feign;
+package ru.imageprocessing.common.configuration.feign;
 
 import feign.Response;
 import feign.codec.Decoder;
