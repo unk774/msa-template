@@ -18,14 +18,11 @@ import ru.imageprocessing.common.configuration.MDCConfiguration;
 @EnableWebSecurity
 @EnableFeignClients(clients = {AuthClient.class, StoreClient.class, UserRegistryClient.class, NotificationClient.class})
 @Import({MDCConfiguration.class, RequestLoggingConfig.class, KeycloakConfiguration.class, OpenApiConfiguration.class})
-//TODO user registry cache
-//TODO user registry getByLogin checks
-//TODO MDC, KeyCloak, S3, OpenApi вынести в commons
 //TODO notification message broker chanel
+//TODO user registry getByLogin checks
 //TODO reactive webflux
 //TODO prometheus
 //TODO tests + jacoco
-//TODO js download button
 //TODO large upload/download check
 public class GatewayApplication {
 

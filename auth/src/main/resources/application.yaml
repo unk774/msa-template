@@ -16,6 +16,11 @@ spring:
         jwt:
           issuer-uri: ${AUTH_SERVER_URL:http://keycloak:8880}/realms/${AUTH_SERVER_REALM:image-processing}
           jwk-set-uri:  ${AUTH_SERVER_URL:http://keycloak:8880}/realms/${AUTH_SERVER_REALM:image-processing}/protocol/openid-connect/certs
+  cache:
+    type: caffeine
+    cache-names: userInfo # Pre-configured cache names
+    caffeine:
+      spec: maximumSize=100,expireAfterWrite=60m  # Global Caffeine specification
 
 keycloak:
   auth-server-url: ${AUTH_SERVER_URL:http://keycloak:8880}

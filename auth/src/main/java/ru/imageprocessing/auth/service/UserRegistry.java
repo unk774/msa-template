@@ -10,6 +10,7 @@ import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import ru.imageprocessing.auth.api.dto.RegisterUserRequest;
 import ru.imageprocessing.auth.api.dto.UserResponse;
@@ -61,6 +62,7 @@ public class UserRegistry {
         }
     }
 
+    @Cacheable("userInfo")
     public UserResponse getUserByLogin(String login) {
         RealmResource realmResource = keycloak.realm(realm);
         UsersResource usersResource = realmResource.users();
