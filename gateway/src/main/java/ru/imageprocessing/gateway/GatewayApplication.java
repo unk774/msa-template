@@ -18,7 +18,9 @@ import ru.imageprocessing.gateway.feign.UserRegistryClient;
 //TODO notification message broker chanel
 //TODO reactive webflux
 //TODO prometheus
-//TODO tests
+//TODO tests + jacoco
+//TODO js download button
+//TODO large upload/download check
 public class GatewayApplication {
 
     public static void main(String[] args) {
