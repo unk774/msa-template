@@ -22,7 +22,6 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -43,22 +42,21 @@ public class S3Service {
     @Value("${s3.forcePathStyle:false}")
     private boolean forcePathStyle;
 
+    @Value("${s3.store-bucket:store}")
+    private String bucketName;
+
     private final S3Client s3Client;
 
-    public void downloadFileRange(String bucketName, String objectKey, long from, long to, S3Downloader s3Downloader) {
+    public InputStream downloadRange(String objectKey, long from, long to) {
         log.info("downloadFileRange/{}/{}/{}/{}", bucketName, objectKey, from, to);
-        try (InputStream inputStream = s3Client.getObject(GetObjectRequest.builder()
+        return s3Client.getObject(GetObjectRequest.builder()
                 .bucket(bucketName)
                 .key(objectKey)
                 .range(String.format("bytes=%d-%d", from, to))
-                .build())) {
-            s3Downloader.download(inputStream);
-        } catch (IOException io) {
-            throw new RuntimeException(io);
-        }
+                .build());
     }
 
-    public void deleteFile(String bucketName, String objectKey) {
+    public void deleteFile(String objectKey) {
         log.info("deleteFile/{}/{}", bucketName, objectKey);
         s3Client.deleteObject(DeleteObjectRequest.builder()
                 .bucket(bucketName)
@@ -66,7 +64,7 @@ public class S3Service {
                 .build());
     }
 
-    public boolean objectKeyExists(String bucketName, String objectKey) {
+    public boolean objectKeyExists(String objectKey) {
         log.info("objectKeyExists/{}/{}", bucketName, objectKey);
         try {
             s3Client.headObject(HeadObjectRequest.builder()
@@ -78,7 +76,7 @@ public class S3Service {
         }
     }
 
-    public void deleteFiles(String bucketName, String... objectKeys) {
+    public void deleteFiles(String... objectKeys) {
         log.info("deleteFiles/{}/{}",bucketName, String.join(",", objectKeys));
         List<ObjectIdentifier> list = Stream.of(objectKeys)
                 .map(objectKey -> ObjectIdentifier.builder().key(objectKey).build())
@@ -90,8 +88,7 @@ public class S3Service {
         log.info("deleteFiles/deleted/{}/{}",bucketName, String.join(",", objectKeys));
     }
 
-    public void uploadStream(String bucketName, String key,
-                                    InputStream inputStream, long contentLength) {
+    public void uploadStream(String key, InputStream inputStream, long contentLength) {
         s3Client.putObject(PutObjectRequest.builder()
                         .bucket(bucketName)
                         .key(key)
@@ -99,7 +96,7 @@ public class S3Service {
                 RequestBody.fromInputStream(inputStream, contentLength));
     }
 
-    public long getFileSize(String bucketName, String objectKey) {
+    public long getFileSize(String objectKey) {
         log.info("getFileSize/complete/{}/{}", bucketName, objectKey);
         GetObjectAttributesResponse response = s3Client.getObjectAttributes(GetObjectAttributesRequest.builder()
                 .bucket(bucketName)
@@ -109,7 +106,7 @@ public class S3Service {
         return response.objectSize();
     }
 
-    public S3FileMetaData getFileMetadata(String bucketName, String objectKey) {
+    public S3FileMetaData getFileMetadata(String objectKey) {
         log.info("getFileSize/complete/{}/{}", bucketName, objectKey);
         Instant lastModified = s3Client.headObject(HeadObjectRequest.builder()
                         .bucket(bucketName)
@@ -120,13 +117,13 @@ public class S3Service {
         return S3FileMetaData.builder()
                 .objectKey(objectKey)
                 .format(FilenameUtils.getExtension(objectKey))
-                .size(getFileSize(bucketName, objectKey))
+                .size(getFileSize(objectKey))
                 .lastModified(lastModified)
                 .build();
     }
 
 
-    public URL getUrl(String bucketName, String objectKey) throws MalformedURLException {
+    public URL getUrl(String objectKey) throws MalformedURLException {
         log.info("S3getUrl/{}/{}", bucketName, objectKey);
         return s3Client.utilities().getUrl(GetUrlRequest.builder()
                 .bucket(bucketName)
@@ -134,7 +131,7 @@ public class S3Service {
                 .build());
     }
 
-    public URL getPresignedUrl(String bucketName, String objectKey, Long expiresIn) {
+    public URL getPresignedUrl(String objectKey, Long expiresIn) {
         log.info("getPresignedUrl/{}/{}/{}", bucketName, objectKey, expiresIn);
 
         try (S3Presigner presigner = S3Presigner.builder()

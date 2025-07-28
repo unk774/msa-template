@@ -28,6 +28,10 @@ spring:
         upload-out-0:
           destination: upload-exchange
           binder: rabbit
+  servlet:
+    multipart:
+      max-file-size: 1GB
+      max-request-size: 1GB
 
 keycloak:
   auth-server-url: ${AUTH_SERVER_URL:http://keycloak:8880}

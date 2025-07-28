@@ -23,7 +23,7 @@ import ru.imageprocessing.common.configuration.feign.FeignConfig;
 //TODO user registry getByLogin checks
 //TODO reactive webflux
 //TODO tests + jacoco
-//TODO large upload/download check
+//TODO swagger multi url
 public class GatewayApplication {
 
     public static void main(String[] args) {
