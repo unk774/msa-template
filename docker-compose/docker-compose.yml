@@ -234,18 +234,20 @@ services:
         fluentd-address: localhost:24224
         tag: notification.logs
   fluent-bit:
-    container_name: fluent-bit
+    image: fluent/fluent-bit:4.0.5
     hostname: fluent-bit
-    image: fluent/fluent-bit
+    container_name: image-processing-fluent-bit
     ports:
       - 24224:24224
       - 24224:24224/udp
     volumes:
       - ./fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+    networks:
+      - image-processing-network
   victorialogs:
-    image: victoriametrics/victoria-logs:latest
+    image: victoriametrics/victoria-logs:v1.26.0
     hostname: victorialogs
-    container_name: victorialogs
+    container_name: image-processing-victorialogs
     restart: unless-stopped
     ports:
       - "9428:9428"
@@ -254,6 +256,35 @@ services:
     command:
       - --storageDataPath=/storage
       - --httpListenAddr=:9428
+    networks:
+      - image-processing-network
+  prometheus:
+    image: prom/prometheus:v3.5.0
+    hostname: prometheus
+    container_name: image-processing-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./prometheus/targets.json:/etc/prometheus/targets.json
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    networks:
+      - image-processing-network
+  grafana:
+    image: grafana/grafana:12.1.0
+    hostname: grafana
+    container_name: image-processing-grafana
+    ports:
+      - "5000:3000"
+    depends_on:
+      - prometheus
+    volumes:
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/provisioning/dashboards/dashboards.yaml:/etc/grafana/provisioning/dashboards/main.yaml
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    networks:
+      - image-processing-network
 networks:
   image-processing-network:
     driver: bridge
