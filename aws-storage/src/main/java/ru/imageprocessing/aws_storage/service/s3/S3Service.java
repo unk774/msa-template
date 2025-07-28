@@ -36,16 +36,11 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class S3Service {
 
-    @Value("${s3.service.endpoint:}")
-    private String serviceEndpoint;
-
-    @Value("${s3.forcePathStyle:false}")
-    private boolean forcePathStyle;
-
     @Value("${s3.store-bucket:store}")
     private String bucketName;
 
     private final S3Client s3Client;
+    private final S3Presigner s3Presigner;
 
     public InputStream downloadRange(String objectKey, long from, long to) {
         log.info("downloadFileRange/{}/{}/{}/{}", bucketName, objectKey, from, to);
@@ -133,25 +128,14 @@ public class S3Service {
 
     public URL getPresignedUrl(String objectKey, Long expiresIn) {
         log.info("getPresignedUrl/{}/{}/{}", bucketName, objectKey, expiresIn);
-
-        try (S3Presigner presigner = S3Presigner.builder()
-                .region(s3Client.serviceClientConfiguration().region())
-                .endpointOverride(URI.create(serviceEndpoint))
-                .serviceConfiguration(S3Configuration.builder()
-                        .pathStyleAccessEnabled(forcePathStyle) // Required for MinIO
+        GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
+                .signatureDuration(Duration.ofSeconds(expiresIn))
+                .getObjectRequest(GetObjectRequest.builder()
+                        .bucket(bucketName)
+                        .key(objectKey)
                         .build())
-                .credentialsProvider(s3Client.serviceClientConfiguration().credentialsProvider())
-                .build()) {
+                .build();
 
-            GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                    .signatureDuration(Duration.ofSeconds(expiresIn))
-                    .getObjectRequest(GetObjectRequest.builder()
-                            .bucket(bucketName)
-                            .key(objectKey)
-                            .build())
-                    .build();
-
-            return presigner.presignGetObject(presignRequest).url();
-        }
+        return s3Presigner.presignGetObject(presignRequest).url();
     }
 }

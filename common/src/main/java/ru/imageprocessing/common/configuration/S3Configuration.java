@@ -7,6 +7,7 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 
 import java.net.URI;
 
@@ -36,6 +37,18 @@ public class S3Configuration {
                 .endpointOverride(URI.create(endpoint))
                 .region(Region.of(signingRegion))
                 .forcePathStyle(forcePathStyle)
+                .build();
+    }
+
+    @Bean
+    public S3Presigner s3PreSigner(S3Client s3Client) {
+        return S3Presigner.builder()
+                .region(s3Client.serviceClientConfiguration().region())
+                .endpointOverride(s3Client.serviceClientConfiguration().endpointOverride().get())
+                .serviceConfiguration(software.amazon.awssdk.services.s3.S3Configuration.builder()
+                        .pathStyleAccessEnabled(forcePathStyle) // Required for MinIO
+                        .build())
+                .credentialsProvider(s3Client.serviceClientConfiguration().credentialsProvider())
                 .build();
     }
 }
