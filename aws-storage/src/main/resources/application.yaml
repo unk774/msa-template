@@ -61,3 +61,19 @@ springdoc:
     url:  ${PUBLIC_URL:http://localhost:8080}/
   show-actuator: false
   enable-groovy: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,loggers,prometheus
+  endpoint:
+    health:
+      show-details: ALWAYS
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  prometheus:
+    metrics:
+      export:
+        enabled: true

@@ -45,3 +45,19 @@ feign:
     url: ${STORE_URL:http://localhost:8080}
   notification:
     url: ${NOTIFICATION_URL:http://localhost:8083}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,loggers,prometheus
+  endpoint:
+    health:
+      show-details: ALWAYS
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  prometheus:
+    metrics:
+      export:
+        enabled: true

@@ -145,6 +145,7 @@ services:
     depends_on:
       - keycloak
       - rabbitmq
+      - fluent-bit
     environment:
       - AUTH_SERVER_URL=http://keycloak:8880
       - S3_ENDPOINT=http://minio:9000
@@ -159,11 +160,17 @@ services:
       - image-processing-network
     ports:
       - 8080:8080
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: store.logs
   image-processing-auth:
     container_name: image-processing-auth
     hostname: image-processing-auth
     depends_on:
       - keycloak
+      - fluent-bit
     environment:
       - AUTH_SERVER_URL=http://keycloak:8880
     image: imageprocessing/image-processing-auth:latest
@@ -171,11 +178,17 @@ services:
       - image-processing-network
     ports:
       - 8081:8081
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: auth.logs
   image-processing-gateway:
     container_name: image-processing-gateway
     hostname: image-processing-gateway
     depends_on:
       - keycloak
+      - fluent-bit
     environment:
       - AUTH_SERVER_URL=http://keycloak:8880
       - STORE_URL=http://image-processing-s3-store:8080
@@ -186,11 +199,17 @@ services:
       - image-processing-network
     ports:
       - 8082:8082
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: gateway.logs
   image-processing-notification:
     container_name: image-processing-notification
     hostname: image-processing-notification
     depends_on:
       - keycloak
+      - fluent-bit
     environment:
       - AUTH_SERVER_URL=http://keycloak:8880
       - S3_ENDPOINT=http://minio:9000
@@ -209,6 +228,32 @@ services:
       - image-processing-network
     ports:
       - 8083:8083
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: notification.logs
+  fluent-bit:
+    container_name: fluent-bit
+    hostname: fluent-bit
+    image: fluent/fluent-bit
+    ports:
+      - 24224:24224
+      - 24224:24224/udp
+    volumes:
+      - ./fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+  victorialogs:
+    image: victoriametrics/victoria-logs:latest
+    hostname: victorialogs
+    container_name: victorialogs
+    restart: unless-stopped
+    ports:
+      - "9428:9428"
+    volumes:
+      - victorialogs_data:/storage
+    command:
+      - --storageDataPath=/storage
+      - --httpListenAddr=:9428
 networks:
   image-processing-network:
     driver: bridge
@@ -217,3 +262,4 @@ volumes:
   postgres_data:
     driver: local
   rabbitmq_data:
+  victorialogs_data:
