@@ -22,7 +22,6 @@ import ru.imageprocessing.common.configuration.feign.FeignConfig;
         OpenApiConfiguration.class, FeignConfig.class})
 //TODO user registry getByLogin checks
 //TODO reactive webflux
-//TODO prometheus
 //TODO tests + jacoco
 //TODO large upload/download check
 public class GatewayApplication {
