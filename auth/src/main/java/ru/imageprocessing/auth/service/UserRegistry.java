@@ -33,7 +33,7 @@ public class UserRegistry {
         // User representation
         UserRepresentation user = new UserRepresentation();
         user.setUsername(registerUserRequest.getLogin());
-        user.setFirstName(registerUserRequest.getPassword());
+        user.setFirstName(registerUserRequest.getFirstName());
         user.setLastName(registerUserRequest.getLastName());
         user.setEmail(registerUserRequest.getEmail());
         user.setEnabled(true);
