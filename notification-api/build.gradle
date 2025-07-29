@@ -5,7 +5,7 @@ plugins {
     id 'maven-publish'
 }
 
-group = 'ru.imageprocessing'
+group = 'org.template'
 version = '0.0.1-SNAPSHOT'
 
 java {

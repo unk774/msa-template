@@ -6,7 +6,7 @@ plugins {
     id 'jacoco'
 }
 
-group = 'ru.imageprocessing'
+group = 'org.template'
 version = '0.0.1-SNAPSHOT'
 
 java {
@@ -93,6 +93,6 @@ jib {
     }
     allowInsecureRegistries = true
     to {
-        image = "imageprocessing/${rootProject.name}-${project.name}:latest"
+        image = "${rootProject.name}/${project.name}:latest"
     }
 }

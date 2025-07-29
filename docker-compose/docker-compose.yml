@@ -193,7 +193,7 @@ services:
     networks:
       - msa-network
   s3-store:
-    image: imageprocessing/image-processing-aws-storage:latest
+    image: ${PROJECT_NAME_PREFIX}/aws-storage:latest
     container_name: ${PROJECT_NAME_PREFIX}-s3-store
     hostname: s3-store
     depends_on:
@@ -219,7 +219,7 @@ services:
         fluentd-address: localhost:24224
         tag: store.logs
   auth:
-    image: imageprocessing/image-processing-auth:latest
+    image: ${PROJECT_NAME_PREFIX}/auth:latest
     container_name: ${PROJECT_NAME_PREFIX}-auth
     hostname: auth
     depends_on:
@@ -237,7 +237,7 @@ services:
         fluentd-address: localhost:24224
         tag: auth.logs
   gateway:
-    image: imageprocessing/image-processing-gateway
+    image: ${PROJECT_NAME_PREFIX}/gateway
     container_name: ${PROJECT_NAME_PREFIX}-gateway
     hostname: gateway
     depends_on:
@@ -258,7 +258,7 @@ services:
         fluentd-address: localhost:24224
         tag: gateway.logs
   notification:
-    image: imageprocessing/image-processing-notification
+    image: ${PROJECT_NAME_PREFIX}/notification
     container_name: ${PROJECT_NAME_PREFIX}-notification
     hostname: notification
     depends_on:

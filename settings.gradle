@@ -1,2 +1,2 @@
-rootProject.name = 'image-processing'
+rootProject.name = 'template'
 include('common', 'aws-storage', 'aws-storage-api', 'auth-api', 'auth', 'notification-api','notification','gateway','gateway-api')
