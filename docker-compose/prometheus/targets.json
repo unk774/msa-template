@@ -1,7 +1,6 @@
 [
   {
-    "targets": ["image-processing-s3-store:8080", "image-processing-auth:8081",
-                "image-processing-gateway:8082", "image-processing-notification:8083"],
+    "targets": ["s3-store:8080", "auth:8081", "gateway:8082", "notification:8083"],
     "labels": {
       "env": "apps"
     }

@@ -1,6 +1,7 @@
 services:
   postgresql:
-    container_name: image-processing-postgresql
+    image: postgres:${POSTGRESQL_VERSION}
+    container_name: ${PROJECT_NAME_PREFIX}-postgresql
     hostname: postgresql
     environment:
       PGDATA: /var/lib/postgresql/pgdata4
@@ -9,7 +10,6 @@ services:
     volumes:
       - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
       - postgres_data:/var/lib/postgresql/pgdata4
-    image: postgres:${POSTGRESQL_VERSION}
     healthcheck:
       test: [ "CMD-SHELL", "exec pg_isready -U ${POSTGRES_USERNAME} -d keycloak" ]
       interval: 5s
@@ -17,12 +17,12 @@ services:
       retries: 5
       start_period: 80s
     networks:
-      - image-processing-network
+      - msa-network
     ports:
       - 5432:5432
   smtp4dev:
     image: rnwood/smtp4dev:v3
-    container_name: image-processing-smtp4dev
+    container_name: ${PROJECT_NAME_PREFIX}-smtp4dev
     hostname: smtp4dev
     ports:
       - "3000:80"         # Web UI port
@@ -30,7 +30,7 @@ services:
       - "465:465"         # SMTPS port (SSL/TLS)
       - "587:587"         # Submission port (STARTTLS)
     networks:
-      - image-processing-network
+      - msa-network
     restart: unless-stopped
     environment:
       - Smtp4Dev__DisableMessageSanitization=true  # Allows HTML emails
@@ -38,8 +38,8 @@ services:
       #- Smtp4Dev__ServerOptions__AllowRemoteConnections=true  # Allow remote access
   keycloak:
     image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}
+    container_name: ${PROJECT_NAME_PREFIX}-keycloak
     hostname: keycloak
-    container_name: image-processing-keycloak
     environment:
       KC_DB: postgres
       DB_VENDOR: POSTGRES
@@ -69,10 +69,11 @@ services:
       postgresql:
         condition: service_healthy
     networks:
-      - image-processing-network
+      - msa-network
   minio:
     image: minio/minio
-    container_name: image-processing-minio
+    container_name: ${PROJECT_NAME_PREFIX}-minio
+    hostname: minio
     command: server /data --console-address ":9090"
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
@@ -114,7 +115,7 @@ services:
       - "9000:9000"
       - "9001:9001"
     networks:
-      - image-processing-network
+      - msa-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
@@ -122,7 +123,7 @@ services:
       retries: 3
   rabbitmq:
     image: rabbitmq:3.12-management
-    container_name: image-processing-rabbitmq
+    container_name: ${PROJECT_NAME_PREFIX}-rabbitmq
     hostname: rabbitmq
     ports:
       - "5672:5672"   # AMQP порт
@@ -138,116 +139,22 @@ services:
       timeout: 10s
       retries: 5
     networks:
-      - image-processing-network
-  image-processing-s3-store:
-    container_name: image-processing-s3-store
-    hostname: image-processing-s3-store
-    depends_on:
-      - keycloak
-      - rabbitmq
-      - fluent-bit
-    environment:
-      - AUTH_SERVER_URL=http://keycloak:8880
-      - S3_ENDPOINT=http://minio:9000
-      - S3_ACCESS_KEY=${MINIO_ROOT_USER}
-      - S3_SECRET_KEY=${MINIO_ROOT_PASSWORD}
-      - RABBIT_HOST=${RABBIT_HOST}
-      - RABBIT_PORT=${RABBIT_PORT}
-      - RABBIT_USERNAME=${RABBIT_USERNAME}
-      - RABBIT_PASSWORD=${RABBIT_PASSWORD}
-    image: imageprocessing/image-processing-aws-storage:latest
-    networks:
-      - image-processing-network
-    ports:
-      - 8080:8080
-    logging:
-      driver: "fluentd"
-      options:
-        fluentd-address: localhost:24224
-        tag: store.logs
-  image-processing-auth:
-    container_name: image-processing-auth
-    hostname: image-processing-auth
-    depends_on:
-      - keycloak
-      - fluent-bit
-    environment:
-      - AUTH_SERVER_URL=http://keycloak:8880
-    image: imageprocessing/image-processing-auth:latest
-    networks:
-      - image-processing-network
-    ports:
-      - 8081:8081
-    logging:
-      driver: "fluentd"
-      options:
-        fluentd-address: localhost:24224
-        tag: auth.logs
-  image-processing-gateway:
-    container_name: image-processing-gateway
-    hostname: image-processing-gateway
-    depends_on:
-      - keycloak
-      - fluent-bit
-    environment:
-      - AUTH_SERVER_URL=http://keycloak:8880
-      - STORE_URL=http://image-processing-s3-store:8080
-      - AUTH_URL=http://image-processing-auth:8081
-      - NOTIFICATION_URL=http://image-processing-notification:8083
-    image: imageprocessing/image-processing-gateway
-    networks:
-      - image-processing-network
-    ports:
-      - 8082:8082
-    logging:
-      driver: "fluentd"
-      options:
-        fluentd-address: localhost:24224
-        tag: gateway.logs
-  image-processing-notification:
-    container_name: image-processing-notification
-    hostname: image-processing-notification
-    depends_on:
-      - keycloak
-      - fluent-bit
-    environment:
-      - AUTH_SERVER_URL=http://keycloak:8880
-      - S3_ENDPOINT=http://minio:9000
-      - S3_ACCESS_KEY=${MINIO_ROOT_USER}
-      - S3_SECRET_KEY=${MINIO_ROOT_PASSWORD}
-      - S3_STORE_BUCKET=${S3_NOTIFICATION_BUCKET}
-      - MAIL_HOST=smtp4dev
-      - MAIL_PORT=25
-      - RABBIT_HOST=${RABBIT_HOST}
-      - RABBIT_PORT=${RABBIT_PORT}
-      - RABBIT_USERNAME=${RABBIT_USERNAME}
-      - RABBIT_PASSWORD=${RABBIT_PASSWORD}
-      - AUTH_URL=http://image-processing-auth:8081
-    image: imageprocessing/image-processing-notification
-    networks:
-      - image-processing-network
-    ports:
-      - 8083:8083
-    logging:
-      driver: "fluentd"
-      options:
-        fluentd-address: localhost:24224
-        tag: notification.logs
+      - msa-network
   fluent-bit:
     image: fluent/fluent-bit:4.0.5
+    container_name: ${PROJECT_NAME_PREFIX}-fluent-bit
     hostname: fluent-bit
-    container_name: image-processing-fluent-bit
     ports:
       - 24224:24224
       - 24224:24224/udp
     volumes:
       - ./fluent-bit/fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
     networks:
-      - image-processing-network
+      - msa-network
   victorialogs:
     image: victoriametrics/victoria-logs:v1.26.0
     hostname: victorialogs
-    container_name: image-processing-victorialogs
+    container_name: ${PROJECT_NAME_PREFIX}-victorialogs
     restart: unless-stopped
     ports:
       - "9428:9428"
@@ -257,11 +164,11 @@ services:
       - --storageDataPath=/storage
       - --httpListenAddr=:9428
     networks:
-      - image-processing-network
+      - msa-network
   prometheus:
     image: prom/prometheus:v3.5.0
+    container_name: ${PROJECT_NAME_PREFIX}-prometheus
     hostname: prometheus
-    container_name: image-processing-prometheus
     ports:
       - "9090:9090"
     volumes:
@@ -270,11 +177,11 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
     networks:
-      - image-processing-network
+      - msa-network
   grafana:
     image: grafana/grafana:12.1.0
     hostname: grafana
-    container_name: image-processing-grafana
+    container_name: ${PROJECT_NAME_PREFIX}-grafana
     ports:
       - "5000:3000"
     depends_on:
@@ -284,11 +191,105 @@ services:
       - ./grafana/provisioning/dashboards/dashboards.yaml:/etc/grafana/provisioning/dashboards/main.yaml
       - ./grafana/dashboards:/var/lib/grafana/dashboards
     networks:
-      - image-processing-network
+      - msa-network
+  s3-store:
+    image: imageprocessing/image-processing-aws-storage:latest
+    container_name: ${PROJECT_NAME_PREFIX}-s3-store
+    hostname: s3-store
+    depends_on:
+      - keycloak
+      - rabbitmq
+      - fluent-bit
+    environment:
+      - AUTH_SERVER_URL=${KEYCLOAK_ENDPOINT}
+      - S3_ENDPOINT=${S3_ENDPOINT}
+      - S3_ACCESS_KEY=${MINIO_ROOT_USER}
+      - S3_SECRET_KEY=${MINIO_ROOT_PASSWORD}
+      - RABBIT_HOST=${RABBIT_HOST}
+      - RABBIT_PORT=${RABBIT_PORT}
+      - RABBIT_USERNAME=${RABBIT_USERNAME}
+      - RABBIT_PASSWORD=${RABBIT_PASSWORD}
+    networks:
+      - msa-network
+    ports:
+      - 8080:8080
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: store.logs
+  auth:
+    image: imageprocessing/image-processing-auth:latest
+    container_name: ${PROJECT_NAME_PREFIX}-auth
+    hostname: auth
+    depends_on:
+      - keycloak
+      - fluent-bit
+    environment:
+      - AUTH_SERVER_URL=${KEYCLOAK_ENDPOINT}
+    networks:
+      - msa-network
+    ports:
+      - 8081:8081
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: auth.logs
+  gateway:
+    image: imageprocessing/image-processing-gateway
+    container_name: ${PROJECT_NAME_PREFIX}-gateway
+    hostname: gateway
+    depends_on:
+      - keycloak
+      - fluent-bit
+    environment:
+      - AUTH_SERVER_URL=${KEYCLOAK_ENDPOINT}
+      - STORE_URL=${STORE_URL}
+      - AUTH_URL=${AUTH_URL}
+      - NOTIFICATION_URL=${NOTIFICATION_URL}
+    networks:
+      - msa-network
+    ports:
+      - 8082:8082
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: gateway.logs
+  notification:
+    image: imageprocessing/image-processing-notification
+    container_name: ${PROJECT_NAME_PREFIX}-notification
+    hostname: notification
+    depends_on:
+      - keycloak
+      - fluent-bit
+    environment:
+      - AUTH_SERVER_URL=${KEYCLOAK_ENDPOINT}
+      - S3_ENDPOINT=${S3_ENDPOINT}
+      - S3_ACCESS_KEY=${MINIO_ROOT_USER}
+      - S3_SECRET_KEY=${MINIO_ROOT_PASSWORD}
+      - S3_STORE_BUCKET=${S3_NOTIFICATION_BUCKET}
+      - MAIL_HOST=smtp4dev
+      - MAIL_PORT=25
+      - RABBIT_HOST=${RABBIT_HOST}
+      - RABBIT_PORT=${RABBIT_PORT}
+      - RABBIT_USERNAME=${RABBIT_USERNAME}
+      - RABBIT_PASSWORD=${RABBIT_PASSWORD}
+      - AUTH_URL=${AUTH_URL}
+    networks:
+      - msa-network
+    ports:
+      - 8083:8083
+    logging:
+      driver: "fluentd"
+      options:
+        fluentd-address: localhost:24224
+        tag: notification.logs
 networks:
-  image-processing-network:
+  msa-network:
     driver: bridge
-    name: image-processing-network
+    name: msa-network
 volumes:
   postgres_data:
     driver: local

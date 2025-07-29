@@ -2655,8 +2655,8 @@
       },
       {
         "current": {
-          "text": "image-processing-auth:8081",
-          "value": "image-processing-auth:8081"
+          "text": "auth:8081",
+          "value": "auth:8081"
         },
         "datasource": "PBFA97CFB590B2093",
         "includeAll": false,
