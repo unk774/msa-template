@@ -20,10 +20,6 @@ import ru.imageprocessing.common.configuration.feign.FeignConfig;
 @EnableFeignClients(clients = {AuthClient.class, StoreClient.class, UserRegistryClient.class, NotificationClient.class})
 @Import({MDCConfiguration.class, RequestLoggingConfig.class, KeycloakConfiguration.class,
         OpenApiConfiguration.class, FeignConfig.class})
-//TODO user registry getByLogin checks
-//TODO reactive webflux
-//TODO tests + jacoco
-//TODO swagger multi url
 public class GatewayApplication {
 
     public static void main(String[] args) {
