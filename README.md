@@ -14,7 +14,7 @@ Run:
 docker-compose up -d  
 ```
 
-Swagger:
+Swagger:\
 http://localhost:8080/api-docs/store/swagger-ui/index.html - Storage service\
 http://localhost:8081/api-docs/auth/swagger-ui/index.html - Authentication service\
 http://localhost:8082/api-docs/gateway/swagger-ui/index.html - API Gateway\
