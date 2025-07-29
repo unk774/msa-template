@@ -49,8 +49,8 @@ openApiGenerate {
     generatorName = "spring"
     inputSpec = "$projectDir/src/main/resources/openapi/openapi-specification.yaml"
     outputDir = "$buildDir/generated"
-    apiPackage = "ru.imageprocessing.gateway.api"
-    modelPackage = "ru.imageprocessing.gateway.api.dto"
+    apiPackage = "${group}.gateway.api"
+    modelPackage = "${group}.gateway.api.dto"
     configOptions = [
             dateLibrary: "java17",
             interfaceOnly: "true",
@@ -91,7 +91,7 @@ tasks.build.finalizedBy(publishToMavenLocal)
 publishing {
     publications {
         maven(MavenPublication) {
-            artifactId = 'gateway-client'
+            artifactId = 'gateway-api'
             from components.java
         }
     }

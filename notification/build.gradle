@@ -33,9 +33,9 @@ repositories {
 
 dependencies {
     implementation project(':common')
-    implementation project(':aws-storage-client')
-    implementation project(':notification-client')
-    implementation project(':auth-client')
+    implementation project(':aws-storage-api')
+    implementation project(':notification-api')
+    implementation project(':auth-api')
 
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
     implementation 'org.springframework.boot:spring-boot-starter-security'

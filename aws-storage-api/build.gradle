@@ -42,6 +42,10 @@ dependencies {
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-api:2.5.0"
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0"
     implementation "org.springdoc:springdoc-openapi-starter-common:2.5.0"
+
+    compileOnly 'org.projectlombok:lombok:1.18.38'
+
+    annotationProcessor 'org.projectlombok:lombok:1.18.38'
 }
 
 
@@ -49,8 +53,8 @@ openApiGenerate {
     generatorName = "spring"
     inputSpec = "$projectDir/src/main/resources/openapi/openapi-specification.yaml"
     outputDir = "$buildDir/generated"
-    apiPackage = "ru.imageprocessing.notification.api"
-    modelPackage = "ru.imageprocessing.notification.api.dto"
+    apiPackage = "${group}.aws_storage.api"
+    modelPackage = "${group}.aws_storage.api.dto"
     configOptions = [
             dateLibrary: "java17",
             interfaceOnly: "true",
@@ -91,7 +95,7 @@ tasks.build.finalizedBy(publishToMavenLocal)
 publishing {
     publications {
         maven(MavenPublication) {
-            artifactId = 'notification-client'
+            artifactId = 'aws-storage-api'
             from components.java
         }
     }

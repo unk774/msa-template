@@ -33,7 +33,7 @@ repositories {
 
 dependencies {
     implementation project(':common')
-    implementation project(':aws-storage-client')
+    implementation project(':aws-storage-api')
 
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
     implementation 'org.springframework.boot:spring-boot-starter-security'
