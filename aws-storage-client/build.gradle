@@ -64,7 +64,8 @@ openApiGenerate {
             skipDefaultInterface: "true",
             documentationProvider: "none",
             useSpringController: "false",
-            useBeanValidation: "false"
+            useBeanValidation: "false",
+            annotationLibrary: "swagger2"
     ]
     typeMappings = [
             "string+binary": "StreamingResponseBody",
