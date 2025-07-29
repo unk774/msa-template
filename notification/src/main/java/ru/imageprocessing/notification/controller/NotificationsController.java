@@ -9,20 +9,22 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.imageprocessing.common.configuration.MDCConfiguration;
 import ru.imageprocessing.notification.api.NotificationsApi;
 import ru.imageprocessing.notification.api.dto.UniversalNotification;
-import ru.imageprocessing.notification.service.NotificationsService;
+import ru.imageprocessing.notification.service.NotificationChannel;
+
+import java.util.List;
 
 @RestController
 @Slf4j
 @RequiredArgsConstructor
 public class NotificationsController implements NotificationsApi {
 
-    private final NotificationsService notificationsService;
+    private final List<NotificationChannel> notificationChannels;
 
     @Override
     public ResponseEntity<Void> sendNotification(UniversalNotification universalNotification) {
         log.info("Creating notification by template code: %s from user: %s"
                 .formatted(universalNotification.getMetaInfo().getTemplateCode(), MDC.get(MDCConfiguration.MDC_USER)));
-        notificationsService.createNotification(universalNotification);
+        notificationChannels.forEach(c -> c.sendNotification(universalNotification));
         return ResponseEntity.status( HttpStatus.OK ).build();
     }
 }

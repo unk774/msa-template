@@ -1,9 +1,6 @@
 package ru.imageprocessing.notification.service;
 
-import lombok.Builder;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.IEngineConfiguration;
@@ -17,7 +14,6 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Map;
@@ -60,7 +56,7 @@ public class S3TemplateResolver implements ITemplateResolver {
         }
 
         @Override
-        public Reader reader() throws IOException {
+        public Reader reader() {
             return new InputStreamReader(s3Client.getObject(GetObjectRequest.builder()
                     .bucket(bucket)
                     .key(objectKey)

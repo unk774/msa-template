@@ -3,6 +3,8 @@ package ru.imageprocessing.notification.service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -13,12 +15,25 @@ import ru.imageprocessing.notification.api.dto.UniversalNotification;
 
 @Service
 @RequiredArgsConstructor
-public class NotificationsService {
+@Slf4j
+public class MailNotificationChannel implements NotificationChannel {
 
     private final SpringTemplateEngine springTemplateEngine;
     private final JavaMailSender mailSender;
 
-    public void createNotification(UniversalNotification universalNotification) {
+    @Override
+    public void sendNotification(UniversalNotification universalNotification) {
+        if (!MetaInfo.NotificationChannelEnum.EMAIL.equals(universalNotification.getMetaInfo().getNotificationChannel())) {
+            return;
+        }
+        if (universalNotification.getMetaInfo() == null) {
+            log.error("mail notification metadata is empty");
+            return;
+        }
+        if (StringUtils.isBlank(universalNotification.getMetaInfo().getRecipient())) {
+            log.error("mail notification recipient is empty");
+            return;
+        }
         try {
             var context = new Context();
             context.setVariables(universalNotification.getData());
