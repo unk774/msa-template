@@ -1,15 +1,15 @@
 {
-  "realm": "image-processing",
+  "realm": "msa-application",
   "enabled": true,
   "accessTokenLifespan": 1800,
   "accessTokenLifespanForImplicitFlow": 9000,
   "users": [
     {
-      "username": "image-processing-admin-account",
+      "username": "msa-application-admin-account",
       "enabled": true,
-      "serviceAccountClientId": "image-processing-admin",
+      "serviceAccountClientId": "msa-application-admin",
       "realmRoles": [
-        "default-roles-image-processing",
+        "default-roles-msa-application",
         "default:read",
         "default:write"
       ],
@@ -50,8 +50,8 @@
   "roles": {
     "realm": [
       {
-        "name": "image-processing-system:admin",
-        "description": "Image processing System Administrator"
+        "name": "msa-application-system:admin",
+        "description": "System Administrator"
       },
       {
         "name": "default:write",
@@ -75,7 +75,7 @@
   ],
   "clients": [
     {
-      "clientId": "image-processing-admin",
+      "clientId": "msa-application-admin",
       "name": "Service account",
       "clientAuthenticatorType": "client-secret",
       "secret": "kqDoa2+jTLpdO5Ab4yqAAqrcDN7AvMXe",
@@ -86,8 +86,8 @@
       "directAccessGrantsEnabled": true,
       "defaultClientScopes": [
         "roles",
-        "image-processing-permissions",
-        "image-processing-system:admin"
+        "msa-application-permissions",
+        "msa-application-system:admin"
       ],
       "optionalClientScopes": [
         "profile"
@@ -96,8 +96,8 @@
   ],
   "clientScopes": [
     {
-      "name": "image-processing-permissions",
-      "description": "Image processing permissions scope",
+      "name": "msa-application-permissions",
+      "description": "permissions scope",
       "protocol": "openid-connect",
       "attributes": {
         "include.in.token.scope": "false",
@@ -190,7 +190,7 @@
           }
         },
         {
-          "name": "image-processing-permissions",
+          "name": "msa-application-permissions",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-usermodel-realm-role-mapper",
           "consentRequired": false,
@@ -201,15 +201,15 @@
             "id.token.claim": "true",
             "lightweight.claim": "false",
             "access.token.claim": "true",
-            "claim.name": "image-processing-permissions",
+            "claim.name": "msa-application-permissions",
             "jsonType.label": "String"
           }
         }
       ]
     },
     {
-      "name": "image-processing-system:admin",
-      "description": "Image processing system admin scope",
+      "name": "msa-application-system:admin",
+      "description": "system admin scope",
       "protocol": "openid-connect",
       "attributes": {
         "include.in.token.scope": "false",
@@ -229,12 +229,12 @@
           }
         },
         {
-          "name": "add-role-image-processing-system:admin",
+          "name": "add-role-msa-application-system:admin",
           "protocol": "openid-connect",
           "protocolMapper": "oidc-hardcoded-role-mapper",
           "consentRequired": false,
           "config": {
-            "role": "image-processing-system:admin"
+            "role": "msa-application-system:admin"
           }
         }
       ]

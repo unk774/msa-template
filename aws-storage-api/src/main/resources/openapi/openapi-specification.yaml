@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: Image Storage Service API
+  title: Storage Service API
   description: Microservice for storing images (AWS S3 / MinIO)
   version: 1.0.0
 servers:

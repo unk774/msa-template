@@ -14,8 +14,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${AUTH_SERVER_URL:http://keycloak:8880}/realms/${AUTH_SERVER_REALM:image-processing}
-          jwk-set-uri:  ${AUTH_SERVER_URL:http://keycloak:8880}/realms/${AUTH_SERVER_REALM:image-processing}/protocol/openid-connect/certs
+          issuer-uri: ${AUTH_SERVER_URL:http://keycloak:8880}/realms/${AUTH_SERVER_REALM:msa-application}
+          jwk-set-uri:  ${AUTH_SERVER_URL:http://keycloak:8880}/realms/${AUTH_SERVER_REALM:msa-application}/protocol/openid-connect/certs
   cache:
     type: caffeine
     cache-names: userInfo # Pre-configured cache names
@@ -24,8 +24,8 @@ spring:
 
 keycloak:
   auth-server-url: ${AUTH_SERVER_URL:http://keycloak:8880}
-  realm: ${AUTH_SERVER_REALM:image-processing}
-  client-id: ${AUTH_SERVER_CLIENT_ID:image-processing-admin}
+  realm: ${AUTH_SERVER_REALM:msa-application}
+  client-id: ${AUTH_SERVER_CLIENT_ID:msa-application-admin}
   client-secret: ${AUTH_SERVER_CLIENT_SECRET:kqDoa2+jTLpdO5Ab4yqAAqrcDN7AvMXe}
 
 springdoc:
